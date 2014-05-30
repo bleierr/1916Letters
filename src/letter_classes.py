@@ -81,6 +81,29 @@ class TxtCorpus(object):
         for key, item in item_from_pickle(self.file).items():
             # returns the transcriptions stored as lists of pages and word token from the letter object's txt attribute
             yield [w for w in item.get_txt() if w not in STOPWORD_LST] 
+            
+    def add_attr(self, name, value):
+        """After checking if such an attribute does not yet exist, adds a single attribute to the object.
+        If the attribute name is already used an error is thrown
+        """
+        if hasattr(self, name):
+            raise AttributeError("API conflict: '%s' is already part of the '%s' API" % (name, self.__class__.__name__))
+        else:
+            setattr(self, name, value)
+            
+    def get_dict(self):
+        if hasattr(self, "dict_path"):
+            return item_from_pickle(self.dict_path)
+        else:
+            raise AttributeError("No attribute with the name dict_path found.")
+        
+    def get_vector_corpus(self):
+        if hasattr(self, "vector_corpus"):
+            return item_from_pickle(self.vector_corpus)
+        else:
+            raise AttributeError("No attribute with the name dict_path found.")
+            
+            
 
 
         

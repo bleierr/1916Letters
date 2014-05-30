@@ -41,21 +41,28 @@ def get_letters_from_Excel(file_path):
     #return dictionary of letter transcriptions
     return letters, wb
 
+def make_vector_corpus(txt_corpus, vec_corpus_file):
+    dictionary = txt_corpus.get_dict()
+    texts = txt_corpus.get_tokens()
+    vec_corpus = [dictionary.doc2bow(text) for text in texts]
+    item_to_pickle(vec_corpus_file, vec_corpus)
+    txt_corpus.add_attr("vector_corpus", vec_corpus_file)
 
-def make_word_dictionary(txt_corpus, filename):
+def make_word_dictionary(txt_corpus, dict_file):
     l = []
     for item in txt_corpus.get_tokens():
         l.append(item)
     
     d = Dictionary(l)
-    item_to_pickle(filename, d)
+    item_to_pickle(dict_file, d)
+    txt_corpus.add_attr("dict_path", dict_file)
 
 
-def make_text_corpus(file_name, corpus_name):
+def make_text_corpus(excel_file, corpus_data_file):
     
-    l, wb = get_letters_from_Excel(file_name)
-    item_to_pickle(corpus_name, l)    
-    return TxtCorpus(corpus_name)
+    dict_of_Letters, wb = get_letters_from_Excel(excel_file)
+    item_to_pickle(corpus_data_file, dict_of_Letters) 
+    return TxtCorpus(corpus_data_file)
 
 
 

@@ -69,6 +69,8 @@ class Test(unittest.TestCase):
         self.assertTrue(isinstance(d, Dictionary))
         self.assertTrue("gold" in d.token2id)    #token2id reverses key - value in dictionary: 32: "house" ==> "house": 32
         self.assertFalse("all" in d.token2id)
+        msg = "Error: The filepath to the gensim Dictionary stored in the TxtCorpus is not correct: {0}"
+        self.assertEqual(self.c.dict_path, TEST_WORD_DICT, msg.format(self.c.dict_path))
         
 
     def tearDown(self):
