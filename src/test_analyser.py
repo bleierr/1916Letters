@@ -7,8 +7,8 @@ import unittest, os
 from analyser import make_mmcorpus_and_dictionary, make_lsi, doc_similarity
 from gensim.corpora import Dictionary
 from gensim import models, interfaces, corpora
-from importer import get_text_from_txt
-from settings import TEST_MIDSUMMER_SAMPLE
+from importer import get_text_from_txt, make_vector_corpus, make_word_dictionary
+from settings import TEST_SAMPLE_DIR, TEST_SHAKESPEAR_DICT, TEST_SHAKESPEAR_VECTOR_CORPUS
 from letter_classes import Letter
 
 documents = ["Human machine interface for lab abc computer applications",
@@ -86,42 +86,47 @@ class Test_dataAnalyser(unittest.TestCase):
         """
         #this sets up the test corpus
         c = get_text_from_txt()
-        print c
+        make_word_dictionary(c, TEST_SHAKESPEAR_DICT)
+        make_vector_corpus(c, TEST_SHAKESPEAR_VECTOR_CORPUS)
+        #print c
         
         
         path = "tmp" + os.sep + "shakespear_corpus.mm"
-        corpus_ids, corpus = c.get_vector_corpus()
-        corpora.MmCorpus.serialize(path, corpus)
+        corpus_ids, mmcorpus = c.get_vector_corpus()
+        #corpora.MmCorpus.serialize(path, corpus)
         
         #get test sample
-        f = open(TEST_MIDSUMMER_SAMPLE, "r")
+        f = open(TEST_SAMPLE_DIR + os.sep + "sample_errors.txt", "r")
         docs = f.read()
         f.close()
         
         l = Letter()
         l.add_page("12", "1", docs)
         
+        #make_sample_vec_lsi(l.get_txt(), dictionary)
+        
         #transform the sample to vector representation
         dictionary = c.get_dict()
         vec_bow = dictionary.doc2bow(l.get_txt())
        
-        mmcorpus = corpora.MmCorpus(path) 
+        #mmcorpus = corpora.MmCorpus(path) 
         tfidf = models.TfidfModel(mmcorpus) 
         corpus_tfidf = tfidf[mmcorpus]
         #vec_tfidf = tfidf[vec_bow]
         
         
-        lsi = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=3)
+        lsi = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=7)
         #sample_tfidf = models.TfidfModel(docs)
         vec_lsi = lsi[vec_bow]
-        print vec_lsi
+        #print vec_lsi
+        print(lsi.show_topics(7))
         
         #for item in mmcorpus:
             #print item
         sims = doc_similarity(vec_lsi, lsi, mmcorpus)
-        print sims
-        print corpus_ids
-        for num, item in zip(corpus_ids, sims):
+        #print sims
+        #print corpus_ids
+        for num, item in sorted(zip(corpus_ids, sims)):
             print num, item
         
         #print sims # returns something else

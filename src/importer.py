@@ -11,25 +11,37 @@ from letter_classes import Letter, TxtCorpus
 from gensim.corpora import Dictionary
 from settings import *
 
-def get_text_from_txt():
+def get_text_files(dir):
+    files = []
+    for file in os.listdir(dir):
+        if file.endswith(".txt"):
+            files.append(file)         
+    return files
+
+def txt_to_object(file_name, page, nr):
+    f = open(file_name, "r")
+    txt = f.read()
+    f.close()
+    l = Letter()
+    l.add_attr("file", file_name)
+    l.add_page(page, nr, txt) # add also pagenumber and timestamp before the string!
+    return l
+    
+
+def get_text_from_txt(path_name, corpus_file_path):
     """
     Gets text from an txt file and imports it, creating a letters file with all the text documents in it
     """
-    documents = [ TEST_MACBETH_TRAG, TEST_RICHARDIII_TRAG, TEST_ERRORS_COM, TEST_MIDSUMMER_COM ]
+    documents = get_text_files(path_name)
     letters = {}
     for idx, item in enumerate(documents):
-        f = open(item, "r")
-        txt = f.read()
-        f.close()
-        l = Letter()
+        l = txt_to_object(TEST_SHAKESPEAR_DIR + os.sep + item, "1", "12")
+        letters[str(idx)+"_"+item] = l
         
-        l.add_page("1", "12", txt) # add also pagenumber and timestamp before the string!
-        letters[str(idx)] = l
-        
-    item_to_pickle(TEST_SHAKESPEAR_CORPUS, letters) 
-    corpus = TxtCorpus(TEST_SHAKESPEAR_CORPUS)
-    make_word_dictionary(corpus, TEST_SHAKESPEAR_DICT)
-    make_vector_corpus(corpus, TEST_SHAKESPEAR_VECTOR_CORPUS)
+    item_to_pickle(corpus_file_path, letters) 
+    corpus = TxtCorpus(corpus_file_path)
+    #make_word_dictionary(corpus, TEST_SHAKESPEAR_DICT)
+    #make_vector_corpus(corpus, TEST_SHAKESPEAR_VECTOR_CORPUS)
     return corpus
         
     
@@ -72,8 +84,7 @@ def make_vector_corpus(txt_corpus, vec_corpus_file):
     text_ids = []
     for text_id, text in id_and_text:
         texts.append(text)
-        text_ids.append(text_id)  
-    print text_ids
+        text_ids.append(text_id)
     vec_corpus = [dictionary.doc2bow(text) for text in texts] 
     item_to_pickle(vec_corpus_file, vec_corpus)
     txt_corpus.add_attr("vector_corpus", vec_corpus_file)
@@ -91,11 +102,11 @@ def make_word_dictionary(txt_corpus, dict_file):
     txt_corpus.add_attr("dict_path", dict_file)
 
 
-def make_text_corpus(excel_file, corpus_data_file):
+def make_text_corpus(excel_file, corpus_file_path):
     
     dict_of_Letters, wb = get_letters_from_Excel(excel_file)
-    item_to_pickle(corpus_data_file, dict_of_Letters) 
-    return TxtCorpus(corpus_data_file)
+    item_to_pickle(corpus_file_path, dict_of_Letters) 
+    return TxtCorpus(corpus_file_path)
 
 
 

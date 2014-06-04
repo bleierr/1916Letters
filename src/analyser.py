@@ -56,8 +56,8 @@ def make_lsi(txt_corpus, dictionary):
     corpus_tfidf = tfidf[txt_corpus]
     """for doc in corpus_tfidf:
         print(doc)"""
-    lsi = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=2)
-    topics = lsi[corpus_tfidf]
+    lsi = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=len(txt_corpus))
+    topics = lsi.show_topics(len(txt_corpus))
     return lsi, corpus_tfidf, topics
 
         
