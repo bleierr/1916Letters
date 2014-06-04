@@ -9,6 +9,7 @@ import re
 import cProfile
 import shelve
 import cPickle as pickle
+from settings import STOPWORD_LST
 
 
 def replace_problem_char(strg):
@@ -58,7 +59,20 @@ def percentage(count, total):
     """
     return 100 * count / total
 
+def txt_no_hapax_no_stopwords(docs):
+    
+    #remove items in stopword list (might not be necessary if it has been done in previous step)
+    texts = [[word.lower() for word in document if word.lower() not in STOPWORD_LST]
+         for document in docs]
 
+    all_tokens = sum(texts, [])
+    #print(all_tokens)
+    
+    #remove all the token that exist only once
+    tokens_once = set(word for word in set(all_tokens) if all_tokens.count(word) == 1)
+    texts = [[word for word in text if word not in tokens_once]
+             for text in texts]
+    
 
 def clean_txt(strg):
     """

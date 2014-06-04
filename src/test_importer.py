@@ -56,7 +56,7 @@ class Test(unittest.TestCase):
         self.assertTrue(isinstance(self.c, TxtCorpus))
         d = item_from_pickle(TEST_WORD_DICT) # get the dictionary from pickle
         vec = d.doc2bow(["this", "a"]) 
-        print vec
+        #print vec
                
         #self.assertEqual(vec, [(1, 1)])
         #self.assertTrue(u"machine" in dictionary.token2id)
@@ -71,6 +71,11 @@ class Test(unittest.TestCase):
         self.assertFalse("all" in d.token2id)
         msg = "Error: The filepath to the gensim Dictionary stored in the TxtCorpus is not correct: {0}"
         self.assertEqual(self.c.dict_path, TEST_WORD_DICT, msg.format(self.c.dict_path))
+        
+    def test_get_text_from_txt(self):
+        c = get_text_from_txt()
+        for item in c.get_tokens():
+            print item[:10]
         
 
     def tearDown(self):

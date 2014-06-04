@@ -22,7 +22,7 @@ class Letter(Bunch):
         super(Letter, self).__init__(*args, **kwargs)
         self.pages = {}
         
-    def add_page(self, page_nr, time_stamp, strg):
+    def add_page(self, page_nr, time_stamp, strg): #think about a generalis. of importer???
         """adds a page to self.txt, 
         a string parameter is expected that will be cleaned of xml markup and transformed into a list
         of word tokens"""
@@ -80,7 +80,7 @@ class TxtCorpus(object):
     def get_tokens(self):
         for key, item in item_from_pickle(self.file).items():
             # returns the transcriptions stored as lists of pages and word token from the letter object's txt attribute
-            yield [w for w in item.get_txt() if w not in STOPWORD_LST] 
+            yield key, [w for w in item.get_txt() if w not in STOPWORD_LST] 
             
     def add_attr(self, name, value):
         """After checking if such an attribute does not yet exist, adds a single attribute to the object.
@@ -99,9 +99,15 @@ class TxtCorpus(object):
         
     def get_vector_corpus(self):
         if hasattr(self, "vector_corpus"):
-            return item_from_pickle(self.vector_corpus)
+            return self.corpus_id_map, item_from_pickle(self.vector_corpus)
         else:
             raise AttributeError("No attribute with the name dict_path found.")
+        
+    def get_ids(self):
+        for key in item_from_pickle(self.file).keys():
+            # returns the transcriptions stored as lists of pages and word token from the letter object's txt attribute
+            yield key
+        
             
             
 

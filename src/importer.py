@@ -9,8 +9,31 @@ import cProfile
 from helper import item_to_pickle
 from letter_classes import Letter, TxtCorpus
 from gensim.corpora import Dictionary
-from settings import FULL_LETTERS_EXCEL
+from settings import *
 
+def get_text_from_txt():
+    """
+    Gets text from an txt file and imports it, creating a letters file with all the text documents in it
+    """
+    documents = [ TEST_MACBETH_TRAG, TEST_RICHARDIII_TRAG, TEST_ERRORS_COM, TEST_MIDSUMMER_COM ]
+    letters = {}
+    for idx, item in enumerate(documents):
+        f = open(item, "r")
+        txt = f.read()
+        f.close()
+        l = Letter()
+        
+        l.add_page("1", "12", txt) # add also pagenumber and timestamp before the string!
+        letters[str(idx)] = l
+        
+    item_to_pickle(TEST_SHAKESPEAR_CORPUS, letters) 
+    corpus = TxtCorpus(TEST_SHAKESPEAR_CORPUS)
+    make_word_dictionary(corpus, TEST_SHAKESPEAR_DICT)
+    make_vector_corpus(corpus, TEST_SHAKESPEAR_VECTOR_CORPUS)
+    return corpus
+        
+    
+        
 
 def get_letters_from_Excel(file_path):
     """
@@ -43,15 +66,25 @@ def get_letters_from_Excel(file_path):
 
 def make_vector_corpus(txt_corpus, vec_corpus_file):
     dictionary = txt_corpus.get_dict()
-    texts = txt_corpus.get_tokens()
-    vec_corpus = [dictionary.doc2bow(text) for text in texts]
+    #returns a list of tuples of (id, text)
+    id_and_text = txt_corpus.get_tokens() 
+    texts = []
+    text_ids = []
+    for text_id, text in id_and_text:
+        texts.append(text)
+        text_ids.append(text_id)  
+    print text_ids
+    vec_corpus = [dictionary.doc2bow(text) for text in texts] 
     item_to_pickle(vec_corpus_file, vec_corpus)
     txt_corpus.add_attr("vector_corpus", vec_corpus_file)
+    
+    txt_corpus.add_attr("corpus_id_map", text_ids)
 
 def make_word_dictionary(txt_corpus, dict_file):
     l = []
+    #get tokens returns a tuple of document id and text
     for item in txt_corpus.get_tokens():
-        l.append(item)
+        l.append(item[1])
     
     d = Dictionary(l)
     item_to_pickle(dict_file, d)

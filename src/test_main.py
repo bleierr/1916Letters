@@ -5,7 +5,7 @@ For the 1916 Letter Analyser
 '''
 import unittest
 import main
-from settings import TEST_EXCEL, TEST_CORPUS, TEST_WORD_DICT, TEST_VECTOR_CORPUS
+from settings import *
 from helper import item_from_pickle
 from gensim.corpora import Dictionary
 from letter_classes import TxtCorpus
@@ -35,7 +35,12 @@ class Test_1916LetterMain(unittest.TestCase):
         
         
     def test_data_analyser(self):
-        pass
+        
+        
+        
+        
+        
+    
     
     def test_pretty_output(self):
         pass

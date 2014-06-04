@@ -8,7 +8,7 @@ from importer import make_text_corpus, make_word_dictionary, make_vector_corpus
 import os
 from helper import item_from_pickle
 from settings import TEST_EXCEL, TEST_CORPUS, TEST_WORD_DICT, TEST_VECTOR_CORPUS
-
+from analyser import make_lsi
 
 
 
@@ -20,6 +20,9 @@ def main_dataimporter(excel_file, corpus_file, dict_file, vec_corpus_file):
     return c    #returns a corpus object
     
 
+def main_analyser(corpus):
+    return make_lsi(corpus)
+
 def main(excel_file, corpus_file, dict_file, vec_corpus_file):
     """
     The main function that starts the analysis process
@@ -27,7 +30,19 @@ def main(excel_file, corpus_file, dict_file, vec_corpus_file):
     
     c = main_dataimporter(excel_file, corpus_file, dict_file, vec_corpus_file)
     
+    print c.get_dict()
+    for key, value in c.get_dict().items():
+        print key, value
     
+    
+    lsi, corpus_lsi = main_analyser(c)
+    
+    for item in lsi.show_topics(num_topics=4, num_words=10):
+        print(item)
+    
+    
+    for item in corpus_lsi:
+        print item
     
     #returns a nltk freq dist obj
     #fdist_no_stop, total_words, most_freq_word, hapaxes = letter_analyser.make_analysis(letters)
