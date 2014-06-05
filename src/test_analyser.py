@@ -26,7 +26,7 @@ class Test_dataAnalyser(unittest.TestCase):
         mmcorpus_path = "tmp" + os.sep + "corpus.mm"
         self.dictionary = make_mmcorpus_and_dictionary([[word for word in document.split()] for document in documents], mmcorpus_path)
         self.mmcorpus = corpora.MmCorpus(mmcorpus_path) #load the saved mmcorpus
-        self.lsi, self.corpus_tfidf, self.topics = make_lsi(self.mmcorpus, self.dictionary)
+        self.lsi, self.topics, self.topicsPerCorpus = make_lsi(self.mmcorpus, self.dictionary)
         
         
     def test_make_vector_corpus_and_dictionary(self):
@@ -46,19 +46,7 @@ class Test_dataAnalyser(unittest.TestCase):
         
     def test_make_lsi(self):
         
-        self.assertTrue(isinstance(self.corpus_tfidf, interfaces.TransformedCorpus))
         self.assertTrue(isinstance(self.topics, interfaces.TransformedCorpus))
-        result_corpus = [[(0, 0.57735026918962573), (1, 0.57735026918962573), (2, 0.57735026918962573)],
-                         [(0, 0.44424552527467476), (3, 0.44424552527467476), (4, 0.44424552527467476), (5, 0.32448702061385548), (6, 0.44424552527467476), (7, 0.32448702061385548)],
-                         [(2, 0.5710059809418182), (5, 0.41707573620227772), (7, 0.41707573620227772), (8, 0.5710059809418182)],
-                         [(1, 0.49182558987264147), (5, 0.71848116070837686), (8, 0.49182558987264147)],
-                         [(3, 0.62825804686700459), (6, 0.62825804686700459), (7, 0.45889394536615247)],
-                         [(9, 1.0)],
-                         [(9, 0.70710678118654746), (10, 0.70710678118654746)],
-                         [(9, 0.50804290089167492), (10, 0.50804290089167492), (11, 0.69554641952003704)],
-                         [(4, 0.62825804686700459), (10, 0.45889394536615247), (11, 0.62825804686700459)]]
-        
-        self.assertEqual([doc for doc in self.corpus_tfidf], result_corpus)
         result_topics = [[(0, -0.066), (1, 0.520)],
                          [(0, -0.197), (1, 0.761)],
                          [(0, -0.090), (1, 0.724)],

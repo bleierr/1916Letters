@@ -67,6 +67,7 @@ class Test(unittest.TestCase):
         """
         d = item_from_pickle(TEST_WORD_DICT) # get the dictionary from pickle
         self.assertTrue(isinstance(d, Dictionary))
+        print d.token2id
         self.assertTrue("gold" in d.token2id)    #token2id reverses key - value in dictionary: 32: "house" ==> "house": 32
         self.assertFalse("all" in d.token2id)
         msg = "Error: The filepath to the gensim Dictionary stored in the TxtCorpus is not correct: {0}"

@@ -27,4 +27,21 @@ TEST_SHAKESPEAR_VECTOR_CORPUS = "tmp" + os.sep + "txt" + os.sep + "shakespear_ve
 FULL_LETTERS_EXCEL = "test_data"+ os.sep + "1916letters_all_latest_translations.xlsx"
 FULL_LETTERS_CORPUS = "tmp" + os.sep + "full_letters.pickle" 
 
-STOPWORD_LST = corpus.stopwords.words("english") + ["&", "&amp;"]
+STOPWORD_LST = corpus.stopwords.words("english") + ["&", "&amp;"] + "conj om i'll th 's".split()
+"""richard bolingbroke buckingham york elizabeth aumerle hastings gloucester macbeth lear 
+demetrius lysander hermia syracuse dromio antipholus ephesus adriana luciana demetrius 
+angelo macduff theseus kent albaumerle gaunt catesby anne"""
+
+#CLEANING_PATTERN = [("no-group", "<[/\w\d\s\"\'=]+>|<!--[/\w\d\s\"\'=.,-]+-->"), ("use-group", "[\W]*(\w+[\w\'-/.]*\w+|\w|&)[\W]*") ] # 1916 letter cleaning pattern
+
+CLEANING_PATTERN = [("no-group", "<[/\w\d\s\"\'=]+>|<!--[/\w\d\s\"\'=.,-]+-->"), 
+                    ("no-group", "\[A-Z]+[\s\.]+"), # Names and comments in some plays
+                    ("use-group", "[\W]*(\w+[\'-/.]*\w+|[a-zA-Z]|&)[\W]*"),
+                    ("no-group", "\[[\w\s\d]*\]"),
+                    ("no-group", "[A-Z]\w+"), #names and place names
+                    ("no-group", "\s[\[\]\'\"\-_<>.;,?!:\(\)]+\s"),
+                    ("no-group", "_"), # remove underscore before a word
+                    ("no-group", "\s\d+\s") #get rid of numbers
+                    ] # Shakespear test cleaning pattern
+
+

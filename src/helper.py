@@ -9,7 +9,7 @@ import re
 import cProfile
 import shelve
 import cPickle as pickle
-from settings import STOPWORD_LST
+from settings import STOPWORD_LST, CLEANING_PATTERN
 
 
 def replace_problem_char(strg):
@@ -17,15 +17,6 @@ def replace_problem_char(strg):
     pat = "’"
     expr = re.compile(pat)
     return expr.sub(repl, strg)
-
-def strip_xml(strg):
-    """
-    Function gets rid of all xml like markup - strings enclosed in angle brackets will be deleted
-    """
-    pat = "<[/\w\d\s\"\'=]+>|<!--[/\w\d\s\"\'=.,-]+-->"
-    expr = re.compile(pat)
-    return ''.join(expr.split(strg)).strip()
-
 
 
 def item_to_shelve(shelve_file, item, name):
@@ -80,15 +71,18 @@ def clean_txt(strg):
     Parameter strg is a string, the function returns a list of strings
     
     """
-    lst_words = strip_xml(replace_problem_char(strg)).split()
-    pat = "[\W]*(\w+[\w\'-/.]*\w+|\w|&)[\W]*"    #gets also rid of all &
-    regex = re.compile(pat)
-    clean_lst_words = []
-    for item in lst_words:
-        mm = regex.match(item)
-        if mm:
-            clean_lst_words.append(mm.group(1).lower())
-    return clean_lst_words
+    for type, pat in CLEANING_PATTERN:
+        if type == "no-group":
+            strg = "".join(re.split(pat , strg))
+        elif type == "use-group":
+            regex = re.compile(pat)
+            lst = []
+            for item in strg.split():
+                mm = regex.match(item)
+                if mm:
+                    lst.append(mm.group(1))
+            strg = " ".join(lst)
+    return strg.lower().split()
             
             
 def replace_strg(strg, lst):

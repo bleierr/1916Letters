@@ -24,6 +24,7 @@ def txt_to_object(file_name, page, nr):
     f.close()
     l = Letter()
     l.add_attr("file", file_name)
+    l.add_attr("Letter", file_name)
     l.add_page(page, nr, txt) # add also pagenumber and timestamp before the string!
     return l
     

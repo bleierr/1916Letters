@@ -42,7 +42,17 @@ class Letter(Bunch):
         for key, page in self.pages.items():
             most_recent_txt = sorted(page, reverse=True)[0][1]
             txt += clean_txt(most_recent_txt)                
-        return txt
+        return [w for w in txt if w not in STOPWORD_LST]
+    
+    def get_dict(self):
+        txt = self.get_txt()
+        dict = {}
+        for item in txt:
+            if item not in dict:
+                dict[item] = 1
+            if item in dict:
+                dict[item] += 1
+        return dict
     
     def get_id(self):
         """Returns the ID of the current letter object"""

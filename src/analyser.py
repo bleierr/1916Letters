@@ -58,7 +58,9 @@ def make_lsi(txt_corpus, dictionary):
         print(doc)"""
     lsi = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=len(txt_corpus))
     topics = lsi.show_topics(len(txt_corpus))
-    return lsi, corpus_tfidf, topics
+    #returns lsi, a list of topics and a list of distribution of topics over the corpus documents
+    doc2topics = lsi[corpus_tfidf]
+    return lsi, topics, doc2topics
 
         
 def doc_similarity(vec_lsi, lsi, mmcorpus):
