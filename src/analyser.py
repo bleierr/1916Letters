@@ -47,7 +47,7 @@ def make_mmcorpus_and_dictionary(docs, path):
     corpora.MmCorpus.serialize(path, corpus)
     return dictionary  
 
-def make_lsi(txt_corpus, dictionary):
+def make_lsi(txt_corpus, dictionary, num_topics):
     """
     Given a text corpus that has a reference to a dictionary and vector corpus 
     the function returns 
@@ -56,8 +56,8 @@ def make_lsi(txt_corpus, dictionary):
     corpus_tfidf = tfidf[txt_corpus]
     """for doc in corpus_tfidf:
         print(doc)"""
-    lsi = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=len(txt_corpus))
-    topics = lsi.show_topics(len(txt_corpus))
+    lsi = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=num_topics)
+    topics = lsi.show_topics(3)
     #returns lsi, a list of topics and a list of distribution of topics over the corpus documents
     doc2topics = lsi[corpus_tfidf]
     return lsi, topics, doc2topics

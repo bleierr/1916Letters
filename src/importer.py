@@ -11,10 +11,14 @@ from letter_classes import Letter, TxtCorpus
 from gensim.corpora import Dictionary
 from settings import *
 
-def get_text_files(dir):
+def get_text_files(dir, ext):
+    """
+    given a directory path the function returns a list of files in this directory
+    the second parameter 'ext' is a string containing the file extension of the files that should be returned, e.g. ".txt"
+    """
     files = []
     for file in os.listdir(dir):
-        if file.endswith(".txt"):
+        if file.endswith(ext):
             files.append(file)         
     return files
 
@@ -31,9 +35,12 @@ def txt_to_object(file_name, page, nr):
 
 def get_text_from_txt(path_name, corpus_file_path):
     """
-    Gets text from an txt file and imports it, creating a letters file with all the text documents in it
+    The function gets first a list of text files form the location 'path_name'
+    The text of each text file will be stored in an Letter obj., and the object will itself be stored in a dictionary
+    The dictionary will be pickled to 'corpus_file_path' and TxtCorpus created that uses this pickle file as source data
+    The TxtCorpus will be returned
     """
-    documents = get_text_files(path_name)
+    documents = get_text_files(path_name, ".txt")
     letters = {}
     for idx, item in enumerate(documents):
         l = txt_to_object(TEST_SHAKESPEAR_DIR + os.sep + item, "1", "12")

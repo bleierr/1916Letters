@@ -48,9 +48,9 @@ def main(corpus_file_path, dict_file_path, vec_corpus_file_path, excel_file=None
     sample_files = get_text_files(TEST_SAMPLE_DIR)
     for file_name in sample_files:
         compare_texts.append(txt_to_object(TEST_SAMPLE_DIR + os.sep + file_name, "page", "nr"))
+        
     
     sims, topics, doc2topics = main_analyser(vector_corpus, dictionary, compare_texts)
-    
     
     
     #prepare data for outputter
@@ -60,6 +60,13 @@ def main(corpus_file_path, dict_file_path, vec_corpus_file_path, excel_file=None
     elif path_name:
         output_data.append(get_text_files(path_name))
     
+    word_freq = [] 
+    for item in c.get_letters():
+        file_name = item.get_id()
+        text_dict = item.get_dict()
+        word_freq.append((file_name, sorted(list(text_dict.items()), key=lambda x:x[1], reverse=True)[:10]))
+    
+    output_data.append(word_freq)
     output_data.append(topics)
     
     #corpus to topic list, list of tuples (corpus id, topic relevance)
@@ -67,11 +74,12 @@ def main(corpus_file_path, dict_file_path, vec_corpus_file_path, excel_file=None
     output_data.append(docId2topicsLst)
     
     sample_results = {}
-    for sample_file, sim in zip(sample_files, sims):
+    #compare_texts is the actual sample file object
+    for sample_file, sim, sample_obj in zip(sample_files, sims, compare_texts):
         text_sim = []
         for file_name, sim_index in sorted(zip(corpus_ids, sim)):
-            text_sim.append("{0}: {1}".format(file_name, sim_index))
-        sample_results[sample_file] = text_sim
+            text_sim.append((int(file_name.split("_")[0]), file_name.split("_"), sim_index))
+        sample_results[sample_file + "; " +str(len(sample_obj.get_txt())) + " words; "] = text_sim
     output_data.append(sample_results)
     
     out =  prepare_output(output_data)
@@ -81,8 +89,8 @@ def main(corpus_file_path, dict_file_path, vec_corpus_file_path, excel_file=None
     f.close()
     
     for item in c.get_letters():
-        if "giue" in item.get_dict():
-            print item.get_id() + "count; " + str(item.get_dict()["giue"])
+        if "chain" in item.get_dict():
+            print item.get_id() + "count; " + str(item.get_dict()["chain"])
         else:
             print "Not in: " + str(item.get_id())
     

@@ -27,7 +27,7 @@ TEST_SHAKESPEAR_VECTOR_CORPUS = "tmp" + os.sep + "txt" + os.sep + "shakespear_ve
 FULL_LETTERS_EXCEL = "test_data"+ os.sep + "1916letters_all_latest_translations.xlsx"
 FULL_LETTERS_CORPUS = "tmp" + os.sep + "full_letters.pickle" 
 
-STOPWORD_LST = corpus.stopwords.words("english") + ["&", "&amp;"] + "conj om i'll th 's".split()
+STOPWORD_LST = corpus.stopwords.words("english") + ["&", "&amp;"] + "conj om i'll th 's and. hee mee thee thy thou o".split()
 """richard bolingbroke buckingham york elizabeth aumerle hastings gloucester macbeth lear 
 demetrius lysander hermia syracuse dromio antipholus ephesus adriana luciana demetrius 
 angelo macduff theseus kent albaumerle gaunt catesby anne"""

@@ -34,7 +34,7 @@ class Test(unittest.TestCase):
             self.assertTrue(isinstance(value, Letter), msg.format(key))
         msg = "Error: In item with the key {0}. The key should be also part of the transcription, but is not found in: {1}"
         for key, value in letters.items():
-            self.assertTrue(key in value.get_txt()[1], msg.format(key, value.get_txt()))
+            self.assertTrue(key in value.get_txt()[0], msg.format(key, value.get_txt()))
         msg = "Error: The key 32 not found in dictionary letters."
         self.assertTrue("32" in letters.keys(), msg)
         
@@ -67,16 +67,24 @@ class Test(unittest.TestCase):
         """
         d = item_from_pickle(TEST_WORD_DICT) # get the dictionary from pickle
         self.assertTrue(isinstance(d, Dictionary))
-        print d.token2id
+        #print d.token2id
         self.assertTrue("gold" in d.token2id)    #token2id reverses key - value in dictionary: 32: "house" ==> "house": 32
         self.assertFalse("all" in d.token2id)
         msg = "Error: The filepath to the gensim Dictionary stored in the TxtCorpus is not correct: {0}"
         self.assertEqual(self.c.dict_path, TEST_WORD_DICT, msg.format(self.c.dict_path))
         
     def test_get_text_from_txt(self):
-        c = get_text_from_txt()
+        c = get_text_from_txt(TEST_SHAKESPEAR_DIR, TEST_SHAKESPEAR_CORPUS)
         for item in c.get_tokens():
-            print item[:10]
+            """get tokens should return a list of tuples, the first item is the key used in the dictionary that serves as source for the TxtCorpusname 
+            the second item is a list of tokens
+            """
+            self.assertTrue(isinstance(item, tuple))
+            self.assertTrue(isinstance(item[0], str))
+            self.assertTrue(isinstance(item[1], list))
+            self.assertTrue("shakespear" in item[0]) # each of the test files used in the shakespear folder contain the name shakespear in the filename, the filename is used as key in the dict
+            
+            
         
 
     def tearDown(self):

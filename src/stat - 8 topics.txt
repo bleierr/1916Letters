@@ -1,0 +1,183 @@
+Training files:
+shakespear_comedy_asYouLikeIt.txt
+shakespear_comedy_errors.txt
+shakespear_comedy_merchantVenice.txt
+shakespear_comedy_midsummernight.txt
+shakespear_comedy_muchAdoeAboutNothing.txt
+shakespear_comedy_twoGentlemenVerona.txt
+shakespear_romance_theTempest.txt
+shakespear_trag_julius_ceasar.txt
+shakespear_trag_kingLear.txt
+shakespear_trag_macbeth.txt
+shakespear_trag_richardII.txt
+shakespear_trag_richardIII.txt
+
+Topic 0 : 0.151*"lord" + 0.105*"cousin" + 0.105*"ducats" + 0.091*"chain" + 0.077*"madam" + 0.073*"tent" + 0.066*"today" + 0.065*"selfe" + 0.064*"mee" + 0.064*"uncle"
+Topic 1 : -0.259*"selfe" + -0.256*"mee" + -0.218*"thinke" + -0.197*"doe" + -0.184*"hee" + -0.179*"goe" + -0.172*"heere" + -0.172*"speake" + -0.167*"heare" + -0.152*"owne"
+Topic 2 : -0.315*"chain" + -0.286*"ducats" + -0.122*"goldsmith" + 0.111*"cousin" + -0.101*"chooseth" + -0.091*"casket" + -0.091*"mart" + -0.087*"ship" + -0.082*"clerk" + -0.081*"abbey"
+Topic 3 : 0.203*"island" + -0.165*"chain" + -0.155*"ducats" + 0.148*"monster" + 0.112*"cell" + 0.112*"e" + 0.109*"fairy" + 0.082*"duke" + 0.075*"isle" + 0.072*"wall"
+Topic 4 : 0.159*"today" + -0.122*"cousin" + 0.120*"honor" + 0.115*"tonight" + -0.107*"gage" + 0.094*"cauldron" + 0.086*"honorable" + -0.084*"uncle" + 0.084*"chain" + 0.083*"knocking"
+Topic 5 : 0.147*"fairy" + 0.107*"wall" + -0.107*"ladyship" + 0.095*"monsieur" + 0.082*"chain" + -0.078*"lines" + -0.074*"letter" + -0.074*"praise," + -0.074*"possessions" + -0.073*"madam"
+Topic 6 : -0.205*"island" + -0.131*"monster" + -0.113*"e" + -0.110*"chain" + 0.106*"fairy" + -0.092*"isle" + 0.089*"wall" + 0.085*"monsieur" + -0.075*"dukedom" + -0.073*"cell"
+Topic 7 : -0.211*"nuncle" + 0.149*"today" + -0.132*"knights" + -0.130*"daughters" + -0.119*"i'ld" + -0.092*"whipp'd" + -0.092*"hovel" + 0.087*"honorable" + 0.078*"senators" + 0.078*"pulpit"
+
+Topics Per Document:
+
+Relevance of the topics to Document: 4_shakespear_comedy_muchAdoeAboutNothing.txt
+0: 0.265971796041; 1: -0.866449267987; 2: 0.00452800322143; 3: -0.0162208637507; 4: -0.00621071050983; 5: 0.0078445631725; 6: -0.00434893808069; 7: 0.00199863061208; 
+Relevance of the topics to Document: 6_shakespear_romance_theTempest.txt
+0: 0.338690176637; 1: 0.0718042780041; 2: -0.123258673916; 3: 0.648999221696; 4: 0.0990895652973; 5: -0.036218705403; 6: -0.60858574641; 7: 0.212171984626; 
+Relevance of the topics to Document: 8_shakespear_trag_kingLear.txt
+0: 0.483480618062; 1: 0.115778546633; 2: 0.0747609677435; 3: 0.0244655348375; 4: 0.0168581314317; 5: -0.0642868422646; 6: -0.08238890261; 7: -0.708289536846; 
+Relevance of the topics to Document: 10_shakespear_trag_richardII.txt
+0: 0.509786820773; 1: 0.144114646459; 2: 0.303509888114; 3: -0.197279189447; 4: -0.45074880509; 5: 0.167005861127; 6: -0.142993014556; 7: 0.138234459685; 
+Relevance of the topics to Document: 9_shakespear_trag_macbeth.txt
+0: 0.436471342303; 1: 0.114344146188; 2: 0.325196890377; 3: 0.0152488489797; 4: 0.505913143404; 5: -0.0120472466987; 6: -0.000939428207442; 7: -0.238360075225; 
+Relevance of the topics to Document: 1_shakespear_comedy_errors.txt
+0: 0.330895837445; 1: 0.0901248966984; 2: -0.614360842616; 3: -0.324891770865; 4: 0.14610656855; 5: 0.130361151827; 6: -0.189502148821; 7: 0.108810299084; 
+Relevance of the topics to Document: 3_shakespear_comedy_midsummernight.txt
+0: 0.354850693797; 1: 0.0843847126163; 2: -0.152475784743; 3: 0.442448442032; 4: -0.01462231451; 5: 0.605027804429; 6: 0.528536196812; 7: 0.0267008376676; 
+Relevance of the topics to Document: 2_shakespear_comedy_merchantVenice.txt
+0: 0.404231028081; 1: 0.0962176982774; 2: -0.520655240537; 3: -0.261142296234; 4: 0.0594087567063; 5: -0.0641859928076; 6: 0.0614355824964; 7: -0.081966346776; 
+Relevance of the topics to Document: 0_shakespear_comedy_asYouLikeIt.txt
+0: 0.26960046778; 1: -0.865340461032; 2: 0.00906415362215; 3: -0.00824284693139; 4: 0.00187712501266; 5: 0.0103966501563; 6: -0.00289645067425; 7: 0.00180604511401; 
+Relevance of the topics to Document: 7_shakespear_trag_julius_ceasar.txt
+0: 0.427054276901; 1: 0.105783880374; 2: 0.25717842156; 3: -0.152475907182; 4: 0.480374026634; 5: -0.189085111897; 6: 0.220241181043; 7: 0.460922028233; 
+Relevance of the topics to Document: 5_shakespear_comedy_twoGentlemenVerona.txt
+0: 0.37790232666; 1: 0.0747432261715; 2: -0.173200966447; 3: 0.282933426279; 4: -0.306907553049; 5: -0.672324273553; 6: 0.359583578822; 7: 0.0405657803996; 
+Relevance of the topics to Document: 11_shakespear_trag_richardIII.txt
+0: 0.568104031927; 1: 0.154891138117; 2: 0.226671561076; 3: -0.205822786743; 4: -0.330807570395; 5: 0.108286263279; 6: -0.10283948021; 7: 0.138385694339; 
+
+The text in file: shakespear_comedy_MerryWivesWindsor.txt has the following similarities to the corpus texts:
+0_shakespear_comedy_asYouLikeIt.txt: 0.999550521374
+10_shakespear_trag_richardII.txt: 0.123438954353
+11_shakespear_trag_richardIII.txt: 0.146613225341
+1_shakespear_comedy_errors.txt: 0.136345073581
+2_shakespear_comedy_merchantVenice.txt: 0.180750593543
+3_shakespear_comedy_midsummernight.txt: 0.121238678694
+4_shakespear_comedy_muchAdoeAboutNothing.txt: 0.999514579773
+5_shakespear_comedy_twoGentlemenVerona.txt: 0.151728883386
+6_shakespear_romance_theTempest.txt: 0.134557858109
+7_shakespear_trag_julius_ceasar.txt: 0.138793289661
+8_shakespear_trag_kingLear.txt: 0.171068012714
+9_shakespear_trag_macbeth.txt: 0.14908875525
+
+
+The text in file: shakespear_comedy_allWellThatEndsWell.txt has the following similarities to the corpus texts:
+0_shakespear_comedy_asYouLikeIt.txt: 0.203768000007
+10_shakespear_trag_richardII.txt: 0.798442363739
+11_shakespear_trag_richardIII.txt: 0.875382184982
+1_shakespear_comedy_errors.txt: 0.579609453678
+2_shakespear_comedy_merchantVenice.txt: 0.825489580631
+3_shakespear_comedy_midsummernight.txt: 0.572269976139
+4_shakespear_comedy_muchAdoeAboutNothing.txt: 0.198105335236
+5_shakespear_comedy_twoGentlemenVerona.txt: 0.719097495079
+6_shakespear_romance_theTempest.txt: 0.541088104248
+7_shakespear_trag_julius_ceasar.txt: 0.670279324055
+8_shakespear_trag_kingLear.txt: 0.905290722847
+9_shakespear_trag_macbeth.txt: 0.805219292641
+
+
+The text in file: shakespear_trag_romeoAndJuliet.txt has the following similarities to the corpus texts:
+0_shakespear_comedy_asYouLikeIt.txt: 0.215384840965
+10_shakespear_trag_richardII.txt: 0.823792040348
+11_shakespear_trag_richardIII.txt: 0.895281434059
+1_shakespear_comedy_errors.txt: 0.611269712448
+2_shakespear_comedy_merchantVenice.txt: 0.820331513882
+3_shakespear_comedy_midsummernight.txt: 0.673265337944
+4_shakespear_comedy_muchAdoeAboutNothing.txt: 0.208545729518
+5_shakespear_comedy_twoGentlemenVerona.txt: 0.702299594879
+6_shakespear_romance_theTempest.txt: 0.572372853756
+7_shakespear_trag_julius_ceasar.txt: 0.700387597084
+8_shakespear_trag_kingLear.txt: 0.821775615215
+9_shakespear_trag_macbeth.txt: 0.762354433537
+
+
+The text in file: sample_midsummernight.txt has the following similarities to the corpus texts:
+0_shakespear_comedy_asYouLikeIt.txt: 0.117587827146
+10_shakespear_trag_richardII.txt: 0.377332180738
+11_shakespear_trag_richardIII.txt: 0.423145115376
+1_shakespear_comedy_errors.txt: 0.287717044353
+2_shakespear_comedy_merchantVenice.txt: 0.428576290607
+3_shakespear_comedy_midsummernight.txt: 0.998540103436
+4_shakespear_comedy_muchAdoeAboutNothing.txt: 0.0997451990843
+5_shakespear_comedy_twoGentlemenVerona.txt: 0.363133609295
+6_shakespear_romance_theTempest.txt: 0.360265523195
+7_shakespear_trag_julius_ceasar.txt: 0.380197197199
+8_shakespear_trag_kingLear.txt: 0.388497769833
+9_shakespear_trag_macbeth.txt: 0.430535167456
+
+
+The text in file: sample_asYouLikeIt.txt has the following similarities to the corpus texts:
+0_shakespear_comedy_asYouLikeIt.txt: 0.99954354763
+10_shakespear_trag_richardII.txt: 0.105762794614
+11_shakespear_trag_richardIII.txt: 0.124652639031
+1_shakespear_comedy_errors.txt: 0.104049429297
+2_shakespear_comedy_merchantVenice.txt: 0.141332730651
+3_shakespear_comedy_midsummernight.txt: 0.107847131789
+4_shakespear_comedy_muchAdoeAboutNothing.txt: 0.999352037907
+5_shakespear_comedy_twoGentlemenVerona.txt: 0.120447695255
+6_shakespear_romance_theTempest.txt: 0.116902977228
+7_shakespear_trag_julius_ceasar.txt: 0.12441444397
+8_shakespear_trag_kingLear.txt: 0.140513941646
+9_shakespear_trag_macbeth.txt: 0.130774512887
+
+
+The text in file: sample_muchAdoAboutNothing.txt has the following similarities to the corpus texts:
+0_shakespear_comedy_asYouLikeIt.txt: 0.998603224754
+10_shakespear_trag_richardII.txt: 0.0928860455751
+11_shakespear_trag_richardIII.txt: 0.109017968178
+1_shakespear_comedy_errors.txt: 0.0979065448046
+2_shakespear_comedy_merchantVenice.txt: 0.136408060789
+3_shakespear_comedy_midsummernight.txt: 0.0887108743191
+4_shakespear_comedy_muchAdoeAboutNothing.txt: 0.999172568321
+5_shakespear_comedy_twoGentlemenVerona.txt: 0.125228226185
+6_shakespear_romance_theTempest.txt: 0.0952154919505
+7_shakespear_trag_julius_ceasar.txt: 0.0939523428679
+8_shakespear_trag_kingLear.txt: 0.124347746372
+9_shakespear_trag_macbeth.txt: 0.0944751650095
+
+
+The text in file: sample_kingLear.txt has the following similarities to the corpus texts:
+0_shakespear_comedy_asYouLikeIt.txt: 0.164427727461
+10_shakespear_trag_richardII.txt: 0.684396326542
+11_shakespear_trag_richardIII.txt: 0.754371881485
+1_shakespear_comedy_errors.txt: 0.420824080706
+2_shakespear_comedy_merchantVenice.txt: 0.704901695251
+3_shakespear_comedy_midsummernight.txt: 0.44434851408
+4_shakespear_comedy_muchAdoeAboutNothing.txt: 0.158573627472
+5_shakespear_comedy_twoGentlemenVerona.txt: 0.605703771114
+6_shakespear_romance_theTempest.txt: 0.463114798069
+7_shakespear_trag_julius_ceasar.txt: 0.500303268433
+8_shakespear_trag_kingLear.txt: 0.996023118496
+9_shakespear_trag_macbeth.txt: 0.831846356392
+
+
+The text in file: sample_errors.txt has the following similarities to the corpus texts:
+0_shakespear_comedy_asYouLikeIt.txt: 0.113233298063
+10_shakespear_trag_richardII.txt: 0.417237877846
+11_shakespear_trag_richardIII.txt: 0.505186796188
+1_shakespear_comedy_errors.txt: 0.996583223343
+2_shakespear_comedy_merchantVenice.txt: 0.870312213898
+3_shakespear_comedy_midsummernight.txt: 0.282487094402
+4_shakespear_comedy_muchAdoeAboutNothing.txt: 0.121038883924
+5_shakespear_comedy_twoGentlemenVerona.txt: 0.265124619007
+6_shakespear_romance_theTempest.txt: 0.357243686914
+7_shakespear_trag_julius_ceasar.txt: 0.40717369318
+8_shakespear_trag_kingLear.txt: 0.410691171885
+9_shakespear_trag_macbeth.txt: 0.339516103268
+
+
+The text in file: sample_juliusCeasar.txt has the following similarities to the corpus texts:
+0_shakespear_comedy_asYouLikeIt.txt: 0.131409555674
+10_shakespear_trag_richardII.txt: 0.474985271692
+11_shakespear_trag_richardIII.txt: 0.573230266571
+1_shakespear_comedy_errors.txt: 0.367814391851
+2_shakespear_comedy_merchantVenice.txt: 0.480992764235
+3_shakespear_comedy_midsummernight.txt: 0.380327939987
+4_shakespear_comedy_muchAdoeAboutNothing.txt: 0.120821490884
+5_shakespear_comedy_twoGentlemenVerona.txt: 0.442029297352
+6_shakespear_romance_theTempest.txt: 0.355376064777
+7_shakespear_trag_julius_ceasar.txt: 0.996102809906
+8_shakespear_trag_kingLear.txt: 0.375374138355
+9_shakespear_trag_macbeth.txt: 0.763248622417

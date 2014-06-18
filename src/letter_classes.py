@@ -139,7 +139,7 @@ if __name__ == "__main__":
         item_to_pickle("tmp" + os.sep + "corpus.pickle", {"Letter1": L1})
         print(L1.Publisher)
     
-    test()
+    #test()
     C = TxtCorpus("tmp" + os.sep + "corpus.shelve")
     for item in C:
         print(item)
