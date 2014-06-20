@@ -100,7 +100,7 @@ class Test_dataAnalyser(unittest.TestCase):
         u'0.460*"system" + 0.373*"user" + 0.332*"eps" + 0.328*"interface" + 0.320*"response" + 0.320*"time" + 0.293*"computer" + 0.280*"human" + 0.171*"survey" + -0.161*"trees"']
         """
         self.assertTrue(isinstance(self.topics, list))
-        self.assertEqual('0.703*"trees" + 0.538*"graph" ', self.topics[0][:30]) # the result could also be '-0.703*"trees" + -0.538*"graph" '
+        self.assertTrue(self.topics[0][:30] in ['0.703*"trees" + 0.538*"graph" ', '-0.703*"trees" + -0.538*"graph" ']) # the result could also be '-0.703*"trees" + 0.538*"graph" '
              
         #as in the example above absolute values are used to test the results, negative values are not relevant (see comment above)
         result = [(0.703, "trees"), (0.538, "graph"), (0.402, "minors"), (0.187, "survey"), (0.061, "system"), (0.060, "response"), (0.060, "time"), (0.058, "user"), (0.049, "computer"), (0.035, "interface")]

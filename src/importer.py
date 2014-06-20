@@ -25,6 +25,7 @@ def get_text_files(dir, ext):
 def txt_to_object(file_name, page, nr):
     f = open(file_name, "r")
     txt = f.read()
+    #print txt
     f.close()
     l = Letter()
     l.add_attr("file", file_name)
@@ -41,15 +42,20 @@ def get_text_from_txt(path_name, corpus_file_path):
     The TxtCorpus will be returned
     """
     documents = get_text_files(path_name, ".txt")
-    letters = {}
+    letters = []
     for idx, item in enumerate(documents):
-        l = txt_to_object(TEST_SHAKESPEAR_DIR + os.sep + item, "1", "12")
-        letters[str(idx)+"_"+item] = l
+        l = txt_to_object(path_name + os.sep + item, "1", "12")
+        txt_id = str(idx)+"_"+item
+        l.add_attr("id", txt_id)
+        letters.append(l)
         
-    item_to_pickle(corpus_file_path, letters) 
-    corpus = TxtCorpus(corpus_file_path)
-    #make_word_dictionary(corpus, TEST_SHAKESPEAR_DICT)
-    #make_vector_corpus(corpus, TEST_SHAKESPEAR_VECTOR_CORPUS)
+    corpus_file_name = corpus_file_path + os.sep + "text_corpus.pickle"
+    item_to_pickle(corpus_file_name, letters) 
+    corpus = TxtCorpus(corpus_file_name)
+    #make a dictionary of the words in the corpus
+    corpus_dict_name = corpus_file_path + os.sep + "text_corpus.dict"
+    corpus_vect_name = corpus_file_path + os.sep + "text_vect_corpus.pickle"
+    make_vector_corpus_and_dictionary(corpus, corpus_vect_name, corpus_dict_name)
     return corpus
         
     
@@ -64,8 +70,7 @@ def get_letters_from_Excel(file_path):
     #Creates an object of type Book from xlrd.book object
     wb = xlrd.open_workbook(filename=file_path, encoding_override="utf-8")
     sheet = wb.sheet_by_index(0)
-    letters = {}
-    
+    letters = []
     for row in range(1,sheet.nrows):
         row_dict = {}
         for col in range(sheet.ncols):
@@ -76,15 +81,29 @@ def get_letters_from_Excel(file_path):
             else:
                 row_dict.update({sheet.cell_value(0,col):sheet.cell_value(row,col)})
         l = Letter(**row_dict)
-        name = l.get_id()
-        if name not in letters:
-            letters[name] = l
-        # l.Translation - 'Translation' is the name that was given to the column in the Excel file - if the name changes the attribute will change too
-        letters[name].add_page(l.Page, l.Timestamp_, l.Translation)
+        txt_id = l.get_id()
+        for item in letters:
+            if txt_id == item.get_id():
+                # l.Translation - 'Translation' is the name that was given to the column in the Excel file - if the name changes the attribute will change too
+                item.add_page(l.Page, l.Timestamp_, l.Translation)
+            else:
+            # l.Translation - 'Translation' is the name that was given to the column in the Excel file - if the name changes the attribute will change too
+                l.add_page(l.Page, l.Timestamp_, l.Translation)
+                letters.append(l)
     #return dictionary of letter transcriptions
     return letters, wb
 
-def make_vector_corpus(txt_corpus, vec_corpus_file):
+def make_vector_corpus_and_dictionary(txt_corpus, vec_corpus_file, dict_file):
+    """
+    Function to create a vector corpus: documents represented as sparse vectors
+    and a dictionary out of the words in the docs
+    docs is a list of documents, each document is a list of words
+    file_path is the file path where the mmcorpus will be saved
+    """
+    #get tokens returns a tuple of document id and text
+    d = Dictionary([i[1] for i in txt_corpus.get_tokens()])
+    item_to_pickle(dict_file, d)
+    txt_corpus.add_attr("dict_path", dict_file)
     dictionary = txt_corpus.get_dict()
     #returns a list of tuples of (id, text)
     id_and_text = txt_corpus.get_tokens() 
@@ -98,16 +117,6 @@ def make_vector_corpus(txt_corpus, vec_corpus_file):
     txt_corpus.add_attr("vector_corpus", vec_corpus_file)
     
     txt_corpus.add_attr("corpus_id_map", text_ids)
-
-def make_word_dictionary(txt_corpus, dict_file):
-    l = []
-    #get tokens returns a tuple of document id and text
-    for item in txt_corpus.get_tokens():
-        l.append(item[1])
-    
-    d = Dictionary(l)
-    item_to_pickle(dict_file, d)
-    txt_corpus.add_attr("dict_path", dict_file)
 
 
 def make_text_corpus(excel_file, corpus_file_path):

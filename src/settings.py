@@ -32,9 +32,9 @@ STOPWORD_LST = corpus.stopwords.words("english") + ["&", "&amp;"] + "conj om i'l
 demetrius lysander hermia syracuse dromio antipholus ephesus adriana luciana demetrius 
 angelo macduff theseus kent albaumerle gaunt catesby anne"""
 
-#CLEANING_PATTERN = [("no-group", "<[/\w\d\s\"\'=]+>|<!--[/\w\d\s\"\'=.,-]+-->"), ("use-group", "[\W]*(\w+[\w\'-/.]*\w+|\w|&)[\W]*") ] # 1916 letter cleaning pattern
+CLEANING_PATTERN = [("no-group", "<[/\w\d\s\"\'=]+>|<!--[/\w\d\s\"\'=.,-]+-->"), ("use-group", "[\W]*(\w+[\w\'-/.]*\w+|\w|&)[\W]*") ] # 1916 letter cleaning pattern
 
-CLEANING_PATTERN = [("no-group", "<[/\w\d\s\"\'=]+>|<!--[/\w\d\s\"\'=.,-]+-->"), 
+"""CLEANING_PATTERN = [("no-group", "<[/\w\d\s\"\'=]+>|<!--[/\w\d\s\"\'=.,-]+-->"), 
                     ("no-group", "\[A-Z]+[\s\.]+"), # Names and comments in some plays
                     ("use-group", "[\W]*(\w+[\'-/.]*\w+|[a-zA-Z]|&)[\W]*"),
                     ("no-group", "\[[\w\s\d]*\]"),
@@ -43,5 +43,6 @@ CLEANING_PATTERN = [("no-group", "<[/\w\d\s\"\'=]+>|<!--[/\w\d\s\"\'=.,-]+-->"),
                     ("no-group", "_"), # remove underscore before a word
                     ("no-group", "\s\d+\s") #get rid of numbers
                     ] # Shakespear test cleaning pattern
+                    """
 
 

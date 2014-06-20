@@ -41,8 +41,8 @@ class Letter(Bunch):
         
         for key, page in self.pages.items():
             most_recent_txt = sorted(page, reverse=True)[0][1]
-            txt += clean_txt(most_recent_txt)                
-        return [w for w in txt if w not in STOPWORD_LST]
+            txt += clean_txt(most_recent_txt)
+        return [w for w in txt]
     
     def get_dict(self):
         txt = self.get_txt()
@@ -78,19 +78,19 @@ class TxtCorpus(object):
         self.file = file_name
     
     def __iter__(self):
-        for key, item in item_from_pickle(self.file).items():
+        for item in item_from_pickle(self.file):
             # returns the transcriptions stored as lists of pages and word token from the letter object's txt attribute
             yield item.get_txt() 
             
     def get_letters(self):
-        for key, item in item_from_pickle(self.file).items():
+        for item in item_from_pickle(self.file):
             # returns the transcriptions stored as lists of pages and word token from the letter object's txt attribute
             yield item
             
     def get_tokens(self):
-        for key, item in item_from_pickle(self.file).items():
+        for item in item_from_pickle(self.file):
             # returns the transcriptions stored as lists of pages and word token from the letter object's txt attribute
-            yield key, [w for w in item.get_txt() if w not in STOPWORD_LST] 
+            yield item.get_id(), [w for w in item.get_txt() if w not in STOPWORD_LST] 
             
     def add_attr(self, name, value):
         """After checking if such an attribute does not yet exist, adds a single attribute to the object.
@@ -113,10 +113,6 @@ class TxtCorpus(object):
         else:
             raise AttributeError("No attribute with the name dict_path found.")
         
-    def get_ids(self):
-        for key in item_from_pickle(self.file).keys():
-            # returns the transcriptions stored as lists of pages and word token from the letter object's txt attribute
-            yield key
         
             
             

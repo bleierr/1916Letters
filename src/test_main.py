@@ -3,12 +3,24 @@ Created on 26 May 2014
 For the 1916 Letter Analyser
 @author: Bleier
 '''
-import unittest
+import unittest, shutil
 import main
 from settings import *
 from helper import item_from_pickle
 from gensim.corpora import Dictionary
 from letter_classes import TxtCorpus
+
+#gensim example
+documents = ["Human machine interface for lab abc computer applications",
+             "A survey of user opinion of computer system response time",
+             "The EPS user interface management system",
+             "System and human system engineering testing of EPS",
+             "Relation of user perceived response time to error measurement",
+             "The generation of random binary unordered trees",
+             "The intersection graph of paths in trees",
+             "Graph minors IV Widths of trees and well quasi ordering",
+             "Graph minors A survey"]
+
 
 class Test_1916LetterMain(unittest.TestCase):
     def test_data_importer(self):
@@ -52,6 +64,24 @@ class Test_1916LetterMain(unittest.TestCase):
     
     def test_pretty_output(self):
         pass
+    
+    
+    
+    def test_main(self):
+        tempdir = "tmp" + os.sep + "gensim_txt"
+        if os.path.isdir(tempdir):
+            shutil.rmtree(tempdir)
+        os.mkdir(tempdir)
+        num_files = len(documents)
+        for idx, item in enumerate(documents):
+            f = open(tempdir + os.sep + "testfile" + str(idx) + ".txt", "w")
+            f.write(item)
+            f.close()
+        main.main(tempdir + os.sep + "testcorpus.pickle", tempdir + os.sep + "test.dict", tempdir + os.sep + "corpus_vector.pickle", excel_file=None, path_name=tempdir)
+            
+        #shutil.rmtree(tempdir)
+        
+        
 
 if __name__ == "__main__":
     unittest.main()
