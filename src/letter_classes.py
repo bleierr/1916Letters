@@ -6,6 +6,7 @@ This module contains the letter class
 '''
 from helper import clean_txt, item_to_pickle, item_from_pickle
 import cProfile, os
+from gensim.corpora import Dictionary
 from settings import STOPWORD_LST
 
 class Bunch(object):
@@ -17,9 +18,9 @@ class Bunch(object):
                 setattr(self, key, value)
 
 
-class Letter(Bunch):
+class TxtItem(Bunch):
     def __init__(self, *args, **kwargs):
-        super(Letter, self).__init__(*args, **kwargs)
+        super(TxtItem, self).__init__(*args, **kwargs)
         self.pages = {}
         
     def add_page(self, page_nr, time_stamp, strg): #think about a generalis. of importer???
@@ -82,7 +83,7 @@ class TxtCorpus(object):
             # returns the transcriptions stored as lists of pages and word token from the letter object's txt attribute
             yield item.get_txt() 
             
-    def get_letters(self):
+    def get_txtitems(self):
         for item in item_from_pickle(self.file):
             # returns the transcriptions stored as lists of pages and word token from the letter object's txt attribute
             yield item
@@ -113,8 +114,37 @@ class TxtCorpus(object):
         else:
             raise AttributeError("No attribute with the name dict_path found.")
         
-        
-            
+    def add_vector_corpus_and_dictionary(self, vec_corpus_file, dict_file):
+        """
+        Method that adds a vector corpus: documents represented as sparse vectors
+        and a dictionary out of the words in the docs in the corpus
+        vec_corpus_file is path where the vector corpus file will be stored
+        dict_file is the path where the dictionary will be stored
+        """
+        #get tokens returns a tuple of document id and text
+        d = Dictionary([i[1] for i in self.get_tokens()])
+        item_to_pickle(dict_file, d)
+        self.add_attr("dict_path", dict_file)
+        dictionary = self.get_dict()
+        #returns a list of tuples of (id, text)
+        id_and_text = self.get_tokens() 
+        texts = []
+        text_ids = []
+        for text_id, text in id_and_text:
+            texts.append(text)
+            text_ids.append(text_id)
+        vec_corpus = [dictionary.doc2bow(text) for text in texts] 
+        item_to_pickle(vec_corpus_file, vec_corpus)
+        if hasattr(self, "vector_corpus"):
+            self.vector_corpus = vec_corpus_file
+        else:
+            self.add_attr("vector_corpus", vec_corpus_file)
+        if hasattr(self, "corpus_id_map"):
+            self.corpus_id_map = text_ids
+        else:
+            self.add_attr("corpus_id_map", text_ids)
+    
+                
             
 
 

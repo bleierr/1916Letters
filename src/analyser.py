@@ -9,7 +9,7 @@ from nltk import Text, FreqDist, corpus
 import importer
 import re
 #The objects that are pickled must be in the namespace where they are unpickled - pickle only pickles the data 
-from letter_classes import Letter, TxtCorpus
+from letter_classes import TxtItem, TxtCorpus
 from gensim import models, corpora, similarities
 from gensim.corpora import Dictionary
 from settings import STOPWORD_LST

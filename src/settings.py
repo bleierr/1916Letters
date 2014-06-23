@@ -10,6 +10,7 @@ from nltk import corpus
 
 TEST_EXCEL = "test_data"+ os.sep + "test_1916Letters.xlsx"
 TEST_CORPUS = "tmp"+ os.sep + "test_corpus.pickle"
+TEST_CORPUS_PATH = "tmp"
 TEST_WORD_DICT = "tmp" + os.sep + "test_word.dict"
 TEST_VECTOR_CORPUS = "tmp" + os.sep + "test_vector_corpus.pickle"
 
