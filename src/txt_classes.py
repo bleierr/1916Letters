@@ -5,9 +5,10 @@ This module contains the letter class
 @author: Bleier
 '''
 from helper import clean_txt, item_to_pickle, item_from_pickle
-import cProfile, os
+import cProfile, os, random
 from gensim.corpora import Dictionary
 from settings import STOPWORD_LST
+from nltk import Text, FreqDist
 
 class Bunch(object):
     def __init__(self, *args, **kwargs):
@@ -19,9 +20,17 @@ class Bunch(object):
 
 
 class TxtItem(Bunch):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, unique_name = None, *args, **kwargs):
         super(TxtItem, self).__init__(*args, **kwargs)
         self.pages = {}
+        if not unique_name:
+            random_string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+            lst = []
+            for item in range(8):
+                lst.append(random.choice(random_string))
+            self.unique_name = "".join(lst)
+        else:
+            self.unique_name = unique_name
         
     def add_page(self, page_nr, time_stamp, strg): #think about a generalis. of importer???
         """adds a page to self.txt, 
@@ -56,8 +65,8 @@ class TxtItem(Bunch):
         return dict
     
     def get_id(self):
-        """Returns the ID of the current letter object"""
-        return self.Letter
+        """Returns the ID / unique name of the current TxtItem"""
+        return self.unique_name
     
     def get_pages(self):
         return self.pages
@@ -70,6 +79,17 @@ class TxtItem(Bunch):
             raise AttributeError("API conflict: '%s' is already part of the '%s' API" % (name, self.__class__.__name__))
         else:
             setattr(self, name, value)
+            
+    def get_word_freq(self):
+        """
+        Given a list of words the function returns a nltk.probability.FreqDist object
+        """
+        words = self.get_txt()
+        texts = [word.lower() for word in words if word.lower() not in STOPWORD_LST]
+        #creates a nltk.text.Text obj
+        txt = Text(texts)
+        #creates a nltk.probability.FreqDist obj
+        return FreqDist(txt)
             
 
 
@@ -110,7 +130,7 @@ class TxtCorpus(object):
         
     def get_vector_corpus(self):
         if hasattr(self, "vector_corpus"):
-            return self.corpus_id_map, item_from_pickle(self.vector_corpus)
+            return item_from_pickle(self.vector_corpus)
         else:
             raise AttributeError("No attribute with the name dict_path found.")
         
@@ -122,7 +142,13 @@ class TxtCorpus(object):
         dict_file is the path where the dictionary will be stored
         """
         #get tokens returns a tuple of document id and text
-        d = Dictionary([i[1] for i in self.get_tokens()])
+        texts = [i[1] for i in self.get_tokens()]
+        #remove all the token that exist only once
+        all_tokens = sum(texts, [])
+        tokens_once = set(word for word in set(all_tokens) if all_tokens.count(word) == 1)
+        texts = [[word for word in text if word not in tokens_once]
+                 for text in texts]
+        d = Dictionary(texts)
         item_to_pickle(dict_file, d)
         self.add_attr("dict_path", dict_file)
         dictionary = self.get_dict()

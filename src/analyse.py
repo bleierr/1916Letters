@@ -5,41 +5,16 @@ Created on 18 Jun 2014
 '''
 
 from gensim import models, corpora, similarities
-from settings import STOPWORD_LST
-import os
 
 
-
-
-def make_mmcorpus_and_dictionary(docs, file_path):
-   
-    
-    #remove items in stopword list (might not be necessary if it has been done in previous step)
-    texts = [[word.lower() for word in document if word.lower() not in STOPWORD_LST]
-         for document in docs]
-
-    all_tokens = sum(texts, [])
-    #print(all_tokens)
-    
-    #remove all the token that exist only once
-    tokens_once = set(word for word in set(all_tokens) if all_tokens.count(word) == 1)
-    texts = [[word for word in text if word not in tokens_once]
-             for text in texts]
-    dictionary = corpora.Dictionary(texts)
-     
-    corpus = [dictionary.doc2bow(text) for text in texts]
-    corpora.MmCorpus.serialize(file_path, corpus)
-    return dictionary  
-
-
-def make_topics(corpus_path, dictionary, num_topics):
+def make_topics(vector_corpus, dictionary, num_topics):
     """
-    Given a text corpus that has a reference to a dictionary and vector corpus 
-    the function returns 
+    Given a vector corpus and a dictionary to translate the vector corpus the function returns a list of topics. 
+    The number of topics generated is specified with the parameter num_topics. 
     """
-    corpus = corpora.MmCorpus(corpus_path)
-    tfidf = models.TfidfModel(corpus)
-    corpus_tfidf = tfidf[corpus]
+    #corpus = corpora.MmCorpus(corpus_path)
+    tfidf = models.TfidfModel(vector_corpus)
+    corpus_tfidf = tfidf[vector_corpus]
     """for doc in corpus_tfidf:
         print(doc)"""
     lsi = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=num_topics)
@@ -64,20 +39,32 @@ def make_topics(corpus_path, dictionary, num_topics):
                              
     return topics
 
-def topics2docs(corpus_path, dictionary, num_topics):
+def topics2docs(vector_corpus, dictionary, num_topics):
     """
-    Given a filepath to mmcorpus and a dictionary that can be used to translate the word ids
-    the function returns a document to topic list.
+    Parameters are a vector corpus file, a dictionary that can be used to translate the vector corpus, 
+    and an integer for num_topics
+    the function returns a document to topic list, with as many topics as requested by num_topics.
     """
-    corpus = corpora.MmCorpus(corpus_path)
-    tfidf = models.TfidfModel(corpus)
-    corpus_tfidf = tfidf[corpus]
-    """for doc in corpus_tfidf:
-        print(doc)"""
+    tfidf = models.TfidfModel(vector_corpus)
+    corpus_tfidf = tfidf[vector_corpus]
     lsi = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=num_topics)
     #returns lsi, a list of topics and a list of distribution of topics over the corpus documents
     doc2topics = lsi[corpus_tfidf]
     return doc2topics
     
-        
+def doc_similarity(vector_corpus, dictionary, test_doc, num_topics):
+    """
+    tests document similarity
+    Given a vector corpus of documents and a test document (test_doc) the function tests the similarity of the test doc to the
+    documents in the vector corpus. test_doc is a list of word tokens. tokens should be all lower case and stopwords removed.
+    A dictionary to translate the vector corpus and a topic number has to be supplied as well.
+    """
+    lsi = models.LsiModel(vector_corpus, id2word=dictionary, num_topics=num_topics)
+    
+    vec_bow = dictionary.doc2bow(test_doc)
+    vec_lsi = lsi[vec_bow] # convert the query to LSI space
+    index = similarities.MatrixSimilarity(lsi[vector_corpus])
+    sims = index[vec_lsi]
+    #sims = sorted(enumerate(sims), key=lambda item: -item[1])
+    return [item for item in sims]       
 

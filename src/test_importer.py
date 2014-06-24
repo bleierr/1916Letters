@@ -4,7 +4,7 @@ Created on 16 May 2014
 @author: Bleier
 '''
 import unittest, re, datetime, time, os, shutil
-from letter_classes import TxtCorpus, TxtItem
+from txt_classes import TxtCorpus, TxtItem
 from importer import *
 from helper import item_to_pickle, item_from_pickle
 from gensim import corpora
@@ -67,6 +67,7 @@ class Test(unittest.TestCase):
         for idx, txt in enumerate(self.c_from_excel.get_txtitems()):
             self.assertTrue(isinstance(txt, TxtItem), msg.format(idx))
         
+        
     def test_time_stamps(self):
         possible_timestamps = ["2013-11-13","2013-09-30", "2013-11-03", "2013-11-05", "2013-09-27"]
         for item in self.c_from_excel.get_txtitems():
@@ -88,7 +89,7 @@ class Test(unittest.TestCase):
         #print vec
                
         #self.assertEqual(vec, [(1, 1)])
-        #self.assertTrue(u"machine" in dictionary.token2id)
+        #self.assertTrue(u"machine" in dictionary.token2id)??????????????
         
     def test_make_word_dictionary(self):
         """
@@ -96,7 +97,7 @@ class Test(unittest.TestCase):
         """
         d = self.c_from_excel.get_dict()
         self.assertTrue(isinstance(d, corpora.Dictionary))
-        self.assertTrue("gold" in d.token2id)    #token2id reverses key - value in dictionary: 32: "house" ==> "house": 32
+        #self.assertTrue("gold" in d.token2id)    #token2id reverses key - value in dictionary: 32: "house" ==> "house": 32
         self.assertFalse("all" in d.token2id)
         msg = "Error: The filepath to the gensim Dictionary stored in the TxtCorpus {0} is not the same as: {1}"
         self.assertEqual(self.c_from_excel.dict_path, self.tempdir_excel + os.sep + "text_corpus.dict", msg.format(self.c_from_excel.dict_path, self.tempdir_excel + os.sep + "text_corpus.dict"))
@@ -114,6 +115,7 @@ class Test(unittest.TestCase):
             self.assertTrue(isinstance(item, tuple))
             self.assertTrue(isinstance(item[0], str))
             self.assertTrue(isinstance(item[1], list))
+            #following test tests if the file names/id are correctly imported
             self.assertTrue("shakespear" in item[0]) # each of the test files used in the shakespear folder contain the name shakespear in the filename, the filename is used as key in the dict
         shutil.rmtree(tempdir_shakespear)  
 

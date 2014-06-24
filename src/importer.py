@@ -7,7 +7,7 @@ import xlrd, os
 import datetime
 import cProfile
 from helper import item_to_pickle
-from letter_classes import TxtItem, TxtCorpus
+from txt_classes import TxtItem, TxtCorpus
 
 def make_text_corpus(texts, file_path, corpus_file_name=None, corpus_dict_name=None, corpus_vect_name=None):
     
@@ -55,10 +55,10 @@ def get_texts_from_files(dir_path, file_path, file_ext=".txt", corpus_file_name=
     documents = get_text_files(dir_path, file_ext)
     texts = []
     for idx, item in enumerate(documents):
-        text = txt_to_object(dir_path + os.sep + item, "1", "12")
+        t = txt_to_object(dir_path + os.sep + item, "1", "12")
         txt_id = str(idx)+"_"+item
-        text.add_attr("id", txt_id)
-        texts.append(text)
+        t.unique_name = txt_id
+        texts.append(t)
     corpus = make_text_corpus(texts, file_path, corpus_file_name, corpus_dict_name, corpus_vect_name)
     return corpus
 
@@ -82,6 +82,7 @@ def get_texts_from_Excel(file_name_excel, file_path, corpus_file_name=None, corp
             else:
                 row_dict.update({sheet.cell_value(0,col):sheet.cell_value(row,col)})
         t = TxtItem(**row_dict)
+        t.unique_name = t.Letter
         txt_id = t.get_id()
         if not len(texts):
             t.add_page(t.Page, t.Timestamp_, t.Translation)
