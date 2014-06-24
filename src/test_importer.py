@@ -123,7 +123,6 @@ class Test(unittest.TestCase):
         self.assertTrue(isinstance(self.c_from_txt, TxtCorpus))
         self.assertTrue(len([item for item in self.c_from_txt]), 9)
         
-
     def tearDown(self):
         shutil.rmtree(self.tempdir_excel)
         shutil.rmtree(self.tempdir_txt)

@@ -33,14 +33,13 @@ def print_histo(rows, column_fill, labels=None, document_name=""):
     return histo
 
 
-def prepare_output(data):
-    output = ""
-    
+def data_to_output_string(data):   
+    output = ''
     #first print the corpus training files
     if "filenames" in data.keys():
         output += "Training files:\n"
-        for item in data["filenames"]:
-            output += item + "\n"
+        for idx, item in enumerate(data["filenames"]):
+            output += idx + "  " + item + "\n"
     
     if "word_freq" in data.keys():   
         #word freq
@@ -55,26 +54,26 @@ def prepare_output(data):
         #print the topics
         output += "\n"
         for idx, item in enumerate(data["topics"]):
-            output += "Topic " + str(idx) + " : " + item + "\n"
+            output += "Topic " + str(idx) + " : " + str(item) + "\n"
                
         
     if "topic_sim" in data.keys():
     #print topics per document
         output += "\nTopics Per Document:\n"
-        for doc_id, topic_list in data["topic_sim"]:
-            output += "\nRelevance of the topics to Document: " + str(doc_id) + "\n"
-            for topic, distribution in topic_list:
-                output += "{0}: {1}; ".format(topic, distribution)
-            output += print_histo(10, [abs(round(item[1]*10,1)) for item in topic_list], [item[0] for item in topic_list], doc_id)
+        for idx, text2topic in enumerate(data["topic_sim"]):
+            output += "\nRelevance of the topics to document " + str(idx) + "\n"
+            for topic, distribution in text2topic:
+                output += "{0}: {1}\n".format(topic, distribution)
+            output += print_histo(10, [abs(round(item[1]*10,1)) for item in text2topic], [item[0] for item in text2topic])
             
     
     if "doc_sim" in data.keys():
         #print sample-texts and how close they are to the individual training texts
-        for name, lst in data["doc_sim"].items():
-            output += "\n\nThe text in file: " + name + " has the following similarities to the corpus texts:\n"
-            for doc_nr, doc_name, sim in sorted(lst):
-                output += "{0}: {1}: {2}   ".format(doc_nr, doc_name[3], sim)
-            output += print_histo(10, [abs(round(float(item[2])*10, 1)) for item in lst], [item[0] for item in lst], name)
+        name, lst = data["doc_sim"]
+        output += "\n\nThe text in file: " + name + " has the following similarities to the corpus texts:\n"
+        for sim, file_name in sorted(lst, reverse=True):
+            output += "{0}: {1}   ".format(file_name, sim)
+        output += print_histo(10, [abs(round(float(item[0])*10, 1)) for item in lst], [item[1] for item in lst], name)
         
     return output
 

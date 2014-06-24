@@ -5,7 +5,7 @@ Created on 4 Jun 2014
 Unittest module to test outputter.py
 '''
 import unittest
-from outputter import prepare_output
+from outputter import data_to_output_string
 
 # the first is a list of file names, the second is a list of topics (returned by lsi.show_topics(n), third is a list of topic similarity, forth is a dictionary filename - similarity stat -zip(corpus_ids, sims)
 data = {"filenames": ["file1.txt", "file2.txt"], 
@@ -20,7 +20,7 @@ class Test(unittest.TestCase):
 
 
     def test_prepare_output(self):
-        returned = prepare_output(data)
+        returned = data_to_output_string(data)
         self.assertTrue("file1.txt" in returned)
         self.assertTrue('Topic 0 : 0.501*"richard" + 0.413*"bolingbroke"' in returned)
         self.assertTrue('The text in file: sample1.txt' in returned)

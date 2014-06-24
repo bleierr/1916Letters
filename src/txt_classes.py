@@ -171,7 +171,8 @@ class TxtCorpus(object):
             self.add_attr("corpus_id_map", text_ids)
     
                 
-            
+    def number_of_txts(self):
+        return len(self.get_vector_corpus())
 
 
         

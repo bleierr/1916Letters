@@ -45,11 +45,11 @@ def txt_to_object(file_name, page, nr):
     t.add_page(page, nr, txt) # add also pagenumber and timestamp before the string!
     return t
 
-def get_texts_from_files(dir_path, file_path, file_ext=".txt", corpus_file_name=None, corpus_dict_name=None, corpus_vect_name=None):
+def get_texts_from_files(dir_path, corpus_dir, file_ext=".txt", corpus_file_name=None, corpus_dict_name=None, corpus_vect_name=None):
     """
-    The function gets first a list of text files form the location 'path_name'
-    The text of each text file will be stored in an Letter obj., and the object will itself be stored in a dictionary
-    The dictionary will be pickled to 'corpus_file_path' and TxtCorpus created that uses this pickle file as source data
+    Given a directory path and a file path the function gets first a list of text files form the location 'dir_path'
+    The text of each text file will be stored in a TxtItem instance, and the instance will be stored in a list
+    The list will be pickled to 'corpus_file_path' and TxtCorpus created that uses this pickle file as source data
     The TxtCorpus will be returned
     """
     documents = get_text_files(dir_path, file_ext)
@@ -59,10 +59,10 @@ def get_texts_from_files(dir_path, file_path, file_ext=".txt", corpus_file_name=
         txt_id = str(idx)+"_"+item
         t.unique_name = txt_id
         texts.append(t)
-    corpus = make_text_corpus(texts, file_path, corpus_file_name, corpus_dict_name, corpus_vect_name)
+    corpus = make_text_corpus(texts, corpus_dir, corpus_file_name, corpus_dict_name, corpus_vect_name)
     return corpus
 
-def get_texts_from_Excel(file_name_excel, file_path, corpus_file_name=None, corpus_dict_name=None, corpus_vect_name=None):
+def get_texts_from_Excel(file_name_excel, corpus_dir, corpus_file_name=None, corpus_dict_name=None, corpus_vect_name=None):
     """
     The function gets data from an Excel file and turn it into a TxtCorpus
     The parameter file_name_excel is a valid file path to an excel file containing texts and metadata
@@ -95,7 +95,7 @@ def get_texts_from_Excel(file_name_excel, file_path, corpus_file_name=None, corp
             # l.Translation - 'Translation' is the name that was given to the column in the Excel file - if the name changes the attribute will change too
                 t.add_page(t.Page, t.Timestamp_, t.Translation)
                 texts.append(t)
-    corpus = make_text_corpus(texts, file_path, corpus_file_name, corpus_dict_name, corpus_vect_name)
+    corpus = make_text_corpus(texts, corpus_dir, corpus_file_name, corpus_dict_name, corpus_vect_name)
     return corpus
 
 
