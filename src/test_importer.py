@@ -3,12 +3,10 @@ Created on 16 May 2014
 
 @author: Bleier
 '''
-import unittest, re, datetime, time, os, shutil
+import unittest, os, shutil
 from txt_classes import TxtCorpus, TxtItem
 from importer import *
-from helper import item_to_pickle, item_from_pickle
 from gensim import corpora
-from settings import TEST_EXCEL, TEST_CORPUS_PATH, TEST_WORD_DICT, TEST_SHAKESPEAR_DIR
 
 
 text = "Human machine interface for lab abc computer applications. A survey of user opinion of computer system response time"
@@ -66,6 +64,8 @@ class Test(unittest.TestCase):
         msg = "Error: The item with number {0} is not of type TxtItem"
         for idx, txt in enumerate(self.c_from_excel.get_txtitems()):
             self.assertTrue(isinstance(txt, TxtItem), msg.format(idx))
+        for item in self.c_from_excel.get_tokens():
+            print item
         
         
     def test_time_stamps(self):
@@ -85,11 +85,7 @@ class Test(unittest.TestCase):
         """
         self.assertTrue(isinstance(self.c_from_excel, TxtCorpus))
         d = self.c_from_excel.get_dict()
-        vec = d.doc2bow(["this", "a"]) 
-        #print vec
-               
-        #self.assertEqual(vec, [(1, 1)])
-        #self.assertTrue(u"machine" in dictionary.token2id)??????????????
+        vec = d.doc2bow(["this", "a"])
         
     def test_make_word_dictionary(self):
         """
@@ -102,22 +98,6 @@ class Test(unittest.TestCase):
         msg = "Error: The filepath to the gensim Dictionary stored in the TxtCorpus {0} is not the same as: {1}"
         self.assertEqual(self.c_from_excel.dict_path, self.tempdir_excel + os.sep + "text_corpus.dict", msg.format(self.c_from_excel.dict_path, self.tempdir_excel + os.sep + "text_corpus.dict"))
         
-    def test_Shakespear_files(self):
-        tempdir_shakespear = "tmp" + os.sep + "shakespear"
-        if os.path.isdir(tempdir_shakespear):
-            shutil.rmtree(tempdir_shakespear)
-        os.mkdir(tempdir_shakespear)
-        c = get_texts_from_files(TEST_SHAKESPEAR_DIR, tempdir_shakespear)
-        for item in c.get_tokens():
-            """get tokens should return a list of tuples, the first item is the key used in the dictionary that serves as source for the TxtCorpusname 
-            the second item is a list of tokens
-            """
-            self.assertTrue(isinstance(item, tuple))
-            self.assertTrue(isinstance(item[0], str))
-            self.assertTrue(isinstance(item[1], list))
-            #following test tests if the file names/id are correctly imported
-            self.assertTrue("shakespear" in item[0]) # each of the test files used in the shakespear folder contain the name shakespear in the filename, the filename is used as key in the dict
-        shutil.rmtree(tempdir_shakespear)  
 
     def test_corpusImportedCorrectly(self):
         self.assertTrue(isinstance(self.c_from_txt, TxtCorpus))

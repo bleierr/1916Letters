@@ -39,7 +39,7 @@ def data_to_output_string(data):
     if "filenames" in data.keys():
         output += "Training files:\n"
         for idx, item in enumerate(data["filenames"]):
-            output += idx + "  " + item + "\n"
+            output += str(idx) + "  " + str(item) + "\n"
     
     if "word_freq" in data.keys():   
         #word freq

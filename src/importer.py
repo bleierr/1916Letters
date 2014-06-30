@@ -35,7 +35,7 @@ def get_text_files(dir, ext):
             files.append(file)         
     return files
 
-def txt_to_object(file_name, page, nr):
+def txt_to_object(file_name, txt_id, page, nr):
     f = open(file_name, "r")
     txt = f.read()
     f.close()
@@ -43,6 +43,7 @@ def txt_to_object(file_name, page, nr):
     t.add_attr("file", file_name)
     t.add_attr("Letter", file_name)
     t.add_page(page, nr, txt) # add also pagenumber and timestamp before the string!
+    t.unique_name = txt_id
     return t
 
 def get_texts_from_files(dir_path, corpus_dir, file_ext=".txt", corpus_file_name=None, corpus_dict_name=None, corpus_vect_name=None):
@@ -55,9 +56,8 @@ def get_texts_from_files(dir_path, corpus_dir, file_ext=".txt", corpus_file_name
     documents = get_text_files(dir_path, file_ext)
     texts = []
     for idx, item in enumerate(documents):
-        t = txt_to_object(dir_path + os.sep + item, "1", "12")
         txt_id = str(idx)+"_"+item
-        t.unique_name = txt_id
+        t = txt_to_object(dir_path + os.sep + item, txt_id, "1", "12")
         texts.append(t)
     corpus = make_text_corpus(texts, corpus_dir, corpus_file_name, corpus_dict_name, corpus_vect_name)
     return corpus
@@ -72,6 +72,7 @@ def get_texts_from_Excel(file_name_excel, corpus_dir, corpus_file_name=None, cor
     wb = xlrd.open_workbook(filename=file_name_excel, encoding_override="utf-8")
     sheet = wb.sheet_by_index(0)
     texts = []
+    text_location = {}
     for row in range(1,sheet.nrows):
         row_dict = {}
         for col in range(sheet.ncols):
@@ -83,19 +84,15 @@ def get_texts_from_Excel(file_name_excel, corpus_dir, corpus_file_name=None, cor
                 row_dict.update({sheet.cell_value(0,col):sheet.cell_value(row,col)})
         t = TxtItem(**row_dict)
         t.unique_name = t.Letter
-        txt_id = t.get_id()
-        if not len(texts):
-            t.add_page(t.Page, t.Timestamp_, t.Translation)
+        if t.unique_name not in text_location:
+            t.add_page(t.Page, t.Translation_Timestamp, t.Translation) #note: has to be tested if attributes are correctly imported!
             texts.append(t)
-        for item in texts:
-            if txt_id == item.get_id():
-                # l.Translation - 'Translation' is the name that was given to the column in the Excel file - if the name changes the attribute will change too
-                item.add_page(t.Page, t.Timestamp_, t.Translation)
-            else:
+            text_location[t.unique_name] = len(texts)-1
+        else:
             # l.Translation - 'Translation' is the name that was given to the column in the Excel file - if the name changes the attribute will change too
-                t.add_page(t.Page, t.Timestamp_, t.Translation)
-                texts.append(t)
+            texts[text_location[t.unique_name]].add_page(t.Page, t.Translation_Timestamp, t.Translation)
     corpus = make_text_corpus(texts, corpus_dir, corpus_file_name, corpus_dict_name, corpus_vect_name)
+    corpus.add_attr("text_location", text_location)
     return corpus
 
 

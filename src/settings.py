@@ -28,11 +28,14 @@ TEST_SHAKESPEAR_VECTOR_CORPUS = "tmp" + os.sep + "txt" + os.sep + "shakespear_ve
 FULL_LETTERS_EXCEL = "test_data"+ os.sep + "1916letters_all_latest_translations.xlsx"
 FULL_LETTERS_CORPUS = "tmp" + os.sep + "full_letters.pickle" 
 
-STOPWORD_LST = corpus.stopwords.words("english") + ["&", "&amp;"] + "conj om i'll th 's and. hee mee thee thy thou o".split()
-"""richard bolingbroke buckingham york elizabeth aumerle hastings gloucester macbeth lear 
+shakespear_add_stopwords = """richard bolingbroke buckingham york elizabeth aumerle hastings gloucester macbeth lear 
 demetrius lysander hermia syracuse dromio antipholus ephesus adriana luciana demetrius 
-angelo macduff theseus kent albaumerle gaunt catesby anne"""
+angelo macduff theseus kent albaumerle gaunt catesby anne conj om i'll th 's and. hee mee thee thy thou o""".split()
 
+STOPWORD_LST = corpus.stopwords.words("english") + ["&", "&amp;"] + "clonbrock cadogan gdns".split() #+ shakespear_add_stopwords
+
+
+#standard cleaning pattern
 CLEANING_PATTERN = [("no-group", "<[/\w\d\s\"\'=]+>|<!--[/\w\d\s\"\'=.,-]+-->"), ("use-group", "[\W]*(\w+[\w\'-/.]*\w+|\w|&)[\W]*") ] # 1916 letter cleaning pattern
 
 """CLEANING_PATTERN = [("no-group", "<[/\w\d\s\"\'=]+>|<!--[/\w\d\s\"\'=.,-]+-->"), 
@@ -45,5 +48,6 @@ CLEANING_PATTERN = [("no-group", "<[/\w\d\s\"\'=]+>|<!--[/\w\d\s\"\'=.,-]+-->"),
                     ("no-group", "\s\d+\s") #get rid of numbers
                     ] # Shakespear test cleaning pattern
                     """
+                    
 
 
