@@ -5,6 +5,14 @@ Created on 18 Jun 2014
 '''
 
 from gensim import models, corpora, similarities
+import os
+
+
+def make_lda_mallet_topics(vect_corpus, dictionary, num_topics=10,):
+    path_to_mallet = "C:"+os.sep+"mallet"+os.sep+"bin"+os.sep+"mallet"
+    mallet_lda = models.LdaMallet(path_to_mallet, corpus=vect_corpus, num_topics=num_topics, id2word=dictionary)
+    print mallet_lda.show_topics()
+
 
 def make_lda_topics(vect_corpus, dictionary, num_topics=10, passes=1):
         

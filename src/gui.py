@@ -194,10 +194,12 @@ class Application(Frame):
         f.write(s)
         f.close()
         
-        t_lda = analyse.make_lda_topics(vect_corpus, dictionary, num_topics=15, passes=10)
+        #t_lda = analyse.make_lda_topics(vect_corpus, dictionary, num_topics=15, passes=10)
         
-        f = open("lda_topics_gensim.txt", "w")
-        for t in t_lda:
+        m_lda = analyse.make_lda_mallet_topics(vect_corpus, dictionary, num_topics=20)
+        
+        f = open("mallet_topics_gensim.txt", "w")
+        for t in m_lda:
             f.writelines(t)
         f.close()
         
