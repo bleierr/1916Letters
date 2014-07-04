@@ -6,6 +6,12 @@ Created on 18 Jun 2014
 
 from gensim import models, corpora, similarities
 
+def make_lda_topics(vect_corpus, dictionary, num_topics=10, passes=1):
+        
+    lda = models.ldamodel.LdaModel(vect_corpus, id2word=dictionary, num_topics=num_topics, passes=passes)
+    
+    return lda.show_topics(topics=15, topn=20, log=False, formatted=True)
+    
 
 def make_topics(vector_corpus, dictionary, num_topics):
     """
@@ -47,6 +53,7 @@ def topics2docs(vector_corpus, dictionary, num_topics):
     """
     tfidf = models.TfidfModel(vector_corpus)
     corpus_tfidf = tfidf[vector_corpus]
+
     lsi = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=num_topics)
     #returns lsi, a list of topics and a list of distribution of topics over the corpus documents
     doc2topics = lsi[corpus_tfidf]
@@ -66,5 +73,7 @@ def doc_similarity(vector_corpus, dictionary, test_doc, num_topics):
     index = similarities.MatrixSimilarity(lsi[vector_corpus])
     sims = index[vec_lsi]
     #sims = sorted(enumerate(sims), key=lambda item: -item[1])
-    return [item for item in sims]       
+    return [item for item in sims] 
+
+      
 

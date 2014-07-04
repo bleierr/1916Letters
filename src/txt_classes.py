@@ -149,6 +149,7 @@ class TxtCorpus(object):
         texts = [[word for word in text if word not in tokens_once]
                  for text in texts]
         d = Dictionary(texts)
+        #d.filter_extremes(no_below=10)
         item_to_pickle(dict_file, d)
         self.add_attr("dict_path", dict_file)
         dictionary = self.get_dict()
@@ -174,28 +175,3 @@ class TxtCorpus(object):
     def number_of_txts(self):
         return len(self.get_vector_corpus())
 
-
-        
-
-if __name__ == "__main__":
-    xml_data = """<p><s>It's time to go to <place>school</place>.</s>
-                <s>This piece of xml is from <name>letter.py</name>.</s></p>"""
-                
-    xml_data2 = """<p><s>Go> <place>home</place>.<!-- comment--></s>
-                <s>What? No. text_file _ -ok.</s></p>"""
-                
-    def test():
-        L1 = Letter(**{"Publisher" : "publ", "House": "my house"})
-        L1.add_page(xml_data)
-        L1.add_page(xml_data2)
-        L1.add_attr("xml", "This is a test")
-        item_to_pickle("tmp" + os.sep + "corpus.pickle", {"Letter1": L1})
-        print(L1.Publisher)
-    
-    #test()
-    C = TxtCorpus("tmp" + os.sep + "corpus.shelve")
-    for item in C:
-        print(item)
-    print(C)
-    #cProfile.run("test()")
-    

@@ -4,7 +4,7 @@ For the 1916 Letter Analyser
 @author: Bleier
 '''
 import unittest, os
-from analyse import make_topics, topics2docs, doc_similarity
+from analyse import make_topics, topics2docs, doc_similarity, make_lda_topics
 from importer import get_texts_from_files
 from txt_classes import TxtCorpus
 from gensim import models, interfaces, corpora
@@ -137,6 +137,14 @@ class Test_dataAnalyser(unittest.TestCase):
         expected = [0.99809301,  0.93748635,  0.99844527,  0.9865886,   0.90755945, -0.12416792, -0.10639259, -0.09879464,  0.05004176]
         self.assertEqual([round(x, 5) for x in sims], [round(x, 5) for x in expected])
         
+    def test_make_lda_topics(self):
+        
+        lst = []
+        for x in [item[1] for item in self.corpus.get_tokens()]:
+            lst.append(x)
+        lda = make_lda_topics(self.vect_corpus, self.dictionary)
+        for item in lda:
+            print item
 
     def tearDown(self):
         shutil.rmtree(self.tempdir_txt)

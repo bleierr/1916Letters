@@ -10,7 +10,7 @@ import unittest, shutil
 import importer, analyse, outputter
 import os
 
-documents = ["Human machine interface for lab abc computer applications",
+documents = ["Human machine interface for lab abc computer applications user",
              "A survey of user opinion of computer system response time",
              "The EPS user interface management system",
              "System and human system engineering testing of EPS",
@@ -18,7 +18,7 @@ documents = ["Human machine interface for lab abc computer applications",
              "The generation of random binary unordered trees",
              "The intersection graph of paths in trees",
              "Graph minors IV Widths of trees and well quasi ordering",
-             "Graph minors A survey"]
+             "Graph minors A survey age"]
 
 class Test_All_Modules(unittest.TestCase):
     def setUp(self):
@@ -77,10 +77,7 @@ class Test_All_Modules(unittest.TestCase):
         doc2topic = analyse.topics2docs(self.vect_corpus, self.dictionary, 2)
         toPrint["topic_sim"] = [item for item in doc2topic]
         test_doc = "Human computer interaction".lower().split()
-        """
-        f = open("test_txt" + os.sep + "txt" + os.sep + "simtest.txt", "r")
-        test_doc = f.read().lower().split()
-        f.close()"""
+      
         sims = analyse.doc_similarity(self.vect_corpus, self.dictionary, test_doc, 2)
         toPrint["doc_sim"] = ("Test Doc", [item for item in zip(sims, range(self.c.number_of_txts()))])
         s = outputter.data_to_output_string(toPrint)

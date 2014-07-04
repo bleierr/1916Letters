@@ -193,6 +193,23 @@ class Application(Frame):
         f = open("letters_stat.txt", "w")
         f.write(s)
         f.close()
+        
+        t_lda = analyse.make_lda_topics(vect_corpus, dictionary, num_topics=15, passes=10)
+        
+        f = open("lda_topics_gensim.txt", "w")
+        for t in t_lda:
+            f.writelines(t)
+        f.close()
+        
+        #print text to files
+        """
+        os.mkdir("corpusfiles")
+        for name, tokens in corpus.get_tokens():
+            f = open("corpusfiles" + os.sep + str(name) + ".txt", "w")
+            for t in tokens:
+                f.write(t+" ")
+            f.close()
+        """ 
         print "done!"
         
             
