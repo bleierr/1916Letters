@@ -64,8 +64,7 @@ class Test(unittest.TestCase):
         msg = "Error: The item with number {0} is not of type TxtItem"
         for idx, txt in enumerate(self.c_from_excel.get_txtitems()):
             self.assertTrue(isinstance(txt, TxtItem), msg.format(idx))
-        for item in self.c_from_excel.get_tokens():
-            print item
+
         
         
     def test_time_stamps(self):

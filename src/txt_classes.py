@@ -47,12 +47,25 @@ class TxtItem(Bunch):
         Returns the list of pages of letter text. Each page is a list of word tokens
         Returned: self.txt
         """
-        txt = []
-        
-        for key, page in self.pages.items():
-            most_recent_txt = sorted(page, reverse=True)[0][1]
-            txt += clean_txt(most_recent_txt)
-        return [w for w in txt]
+        if hasattr(self, "txt_file_path"):
+            with open(self.txt_file_path) as f:
+                txt = f.read()
+            return txt.split()
+        else:
+            txt = []
+            
+            for key, page in self.pages.items():
+                most_recent_txt = sorted(page, reverse=True)[0][1]
+                txt += clean_txt(most_recent_txt)
+            return [w for w in txt]
+    
+    def add_txt_file(self):
+        txt = self.get_txt()
+        if not os.path.dirname("txt"):
+            os.mkdir("txt")
+        with open("txt" + os.sep + str(self.unique_name) + ".txt", "w") as f:
+            f.write(txt)
+        self.add_attr("txt_file_path", "txt" + os.sep + str(self.unique_name) + ".txt")
     
     def get_dict(self):
         txt = self.get_txt()
