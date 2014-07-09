@@ -5,17 +5,16 @@ Created on 13 May 2014
 @author: Bleier
 '''
 from __future__ import division
-import re
+import re, os
 import cProfile
 import shelve
 import cPickle as pickle
-from settings import STOPWORD_LST, CLEANING_PATTERN
+from settings import STOPWORD_LST
 
 
 def replace_problem_char(strg):
-    repl = "'"
-    pat = "’"
-    expr = re.compile(pat)
+    for pat, repl in [("é", "e"), ("’", "'")]:
+        expr = re.compile(pat)
     return expr.sub(repl, strg)
 
 
@@ -63,27 +62,19 @@ def txt_no_hapax_no_stopwords(docs):
     tokens_once = set(word for word in set(all_tokens) if all_tokens.count(word) == 1)
     texts = [[word for word in text if word not in tokens_once]
              for text in texts]
-    
 
-def clean_txt(strg):
+def get_text_files(filedir, ext):
     """
-    Strips xml markup from string, splits a string into word token, strips leading and trailing punctuation and white space
-    Parameter strg is a string, the function returns a list of strings
-    
+    given a directory path the function returns a list of files in this directory
+    the second parameter 'ext' is a string containing the file extension of the files that should be returned, e.g. ".txt"
     """
-    for type, pat in CLEANING_PATTERN:
-        if type == "no-group":
-            strg = "".join(re.split(pat , strg))
-        elif type == "use-group":
-            regex = re.compile(pat)
-            lst = []
-            for item in strg.split():
-                mm = regex.match(item)
-                if mm:
-                    lst.append(mm.group(1))
-            strg = " ".join(lst)
-    return strg.lower().split()
-            
+    files = []
+    for file in os.listdir(filedir):
+        if file.endswith(ext):
+            files.append(file)         
+    return files    
+
+
             
 def replace_strg(strg, lst):
     """
@@ -96,9 +87,5 @@ def replace_strg(strg, lst):
     return cleanStrg
 
 
-if __name__ == "__main__":
-    
-    cProfile.run("strip_punct()")
-    cProfile.run("clean_txt()")
 
     

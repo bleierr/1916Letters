@@ -47,13 +47,17 @@ class Test(unittest.TestCase):
             shutil.rmtree(self.tempdir_gensim)
         os.mkdir(self.tempdir_gensim)
         
-        self.c_from_excel = get_texts_from_Excel(excel_file, self.tempdir_excel) # makes the test corpus from an excel file
+        # makes the test corpus from an excel file
+        texts, id2texts = get_texts_from_Excel(excel_file, self.tempdir_excel) 
+        self.c_from_excel = make_text_corpus(texts, self.tempdir_excel)
         
         for idx, item in enumerate(documents):
             f = open(self.tempdir_txt + os.sep + "testfile" + str(idx) + ".txt", "w")
             f.write(item)
             f.close()
-        self.c_from_txt = get_texts_from_files(self.tempdir_txt, self.tempdir_txt, ".txt") #makes a text corpus from a number of text files
+        #makes a text corpus from a number of text files
+        texts, id2texts = get_texts_from_files(self.tempdir_txt, self.tempdir_txt, ".txt") 
+        self.c_from_txt = make_text_corpus(texts, self.tempdir_txt)
         
     def test_get_texts_from_Excel(self):
         """

@@ -5,8 +5,8 @@ Created on 16 May 2014
 '''
 import xlrd, os
 import datetime
-import cProfile
-from helper import item_to_pickle
+import shutil
+from helper import item_to_pickle, get_text_files
 from txt_classes import TxtItem, TxtCorpus
 from settings import TIMESTAMP_COL, TRANSCRIPTION_COL, TXT_ID, PAGE_COL
 
@@ -25,17 +25,6 @@ def make_text_corpus(texts, file_path, corpus_file_name=None, corpus_dict_name=N
     corpus.add_vector_corpus_and_dictionary(corpus_vect_name, corpus_dict_name)
     return corpus
 
-def get_text_files(dir, ext):
-    """
-    given a directory path the function returns a list of files in this directory
-    the second parameter 'ext' is a string containing the file extension of the files that should be returned, e.g. ".txt"
-    """
-    files = []
-    for file in os.listdir(dir):
-        if file.endswith(ext):
-            files.append(file)         
-    return files
-
 def txt_to_object(file_name, txt_id, page, nr):
     f = open(file_name, "r")
     txt = f.read()
@@ -47,7 +36,7 @@ def txt_to_object(file_name, txt_id, page, nr):
     t.unique_name = txt_id
     return t
 
-def get_texts_from_files(dir_path, corpus_dir, file_ext=".txt", corpus_file_name=None, corpus_dict_name=None, corpus_vect_name=None):
+def get_texts_from_files(dir_path, corpus_dir, file_ext=".txt"):
     """
     Given a directory path and a file path the function gets first a list of text files form the location 'dir_path'
     The text of each text file will be stored in a TxtItem instance, and the instance will be stored in a list
@@ -55,15 +44,22 @@ def get_texts_from_files(dir_path, corpus_dir, file_ext=".txt", corpus_file_name
     The TxtCorpus will be returned
     """
     documents = get_text_files(dir_path, file_ext)
+    text_location_dict = {}
     texts = []
-    for idx, item in enumerate(documents):
-        txt_id = str(idx)+"_"+item
-        t = txt_to_object(dir_path + os.sep + item, txt_id, "1", "12")
+    for idx, file_path in enumerate(documents):
+        unique_name = str(idx)+"_"+file_path
+        t = TxtItem(unique_name, file_path)
+        file_path = corpus_dir + os.sep + "txt"
+        file_name = unique_name + ".txt"
+        t.add_txt_file(file_path, file_name)
         texts.append(t)
-    corpus = make_text_corpus(texts, corpus_dir, corpus_file_name, corpus_dict_name, corpus_vect_name)
-    return corpus
+        try:
+            #dictionary to map text ids with object location - for quick access of individual items
+            text_location_dict[unique_name] = len(texts)-1
+        except KeyError: ("Error: The unique name for the object is already used. The imported text files seem to have the same name.")
+    return texts, text_location_dict
 
-def get_texts_from_Excel(file_name_excel, corpus_dir, corpus_file_name=None, corpus_dict_name=None, corpus_vect_name=None):
+def get_texts_from_Excel(file_name_excel, corpus_dir):
     """
     The function gets data from an Excel file and turn it into a TxtCorpus
     The parameter file_name_excel is a valid file path to an excel file containing texts and metadata
@@ -73,7 +69,7 @@ def get_texts_from_Excel(file_name_excel, corpus_dir, corpus_file_name=None, cor
     wb = xlrd.open_workbook(filename=file_name_excel, encoding_override="utf-8")
     sheet = wb.sheet_by_index(0)
     texts = []
-    text_location = {}
+    text_location_dict = {}
     for row in range(1,sheet.nrows):
         row_dict = {}
         for col in range(sheet.ncols):
@@ -83,22 +79,29 @@ def get_texts_from_Excel(file_name_excel, corpus_dir, corpus_file_name=None, cor
                 row_dict.update({sheet.cell_value(0,col): date_py}) # a datetime.datetime obj is stored
             else:
                 row_dict.update({sheet.cell_value(0,col):sheet.cell_value(row,col)})
-        t = TxtItem(**row_dict)
-        t.unique_name = getattr(t, TXT_ID)
-        if t.unique_name not in text_location:
+        unique_name = str(row_dict[TXT_ID])
+        t = TxtItem(unique_name, **row_dict)
+        
+        if t.unique_name not in text_location_dict:
             t.add_page(getattr(t, PAGE_COL), getattr(t, TIMESTAMP_COL), getattr(t, TRANSCRIPTION_COL)) #note: has to be tested if attributes are correctly imported!
             texts.append(t)
-            text_location[t.unique_name] = len(texts)-1
+            #dictionary to map text ids with object location - for quick access of individual items
+            text_location_dict[t.unique_name] = len(texts)-1
         else:
             # l.Translation - 'Translation' is the name that was given to the column in the Excel file - if the name changes the attribute will change too
-            texts[text_location[t.unique_name]].add_page(getattr(t, PAGE_COL), getattr(t, TIMESTAMP_COL), getattr(t, TRANSCRIPTION_COL))
-    corpus = make_text_corpus(texts, corpus_dir, corpus_file_name, corpus_dict_name, corpus_vect_name)
-    corpus.add_attr("text_location", text_location)
-    return corpus
-
+            texts[text_location_dict[t.unique_name]].add_page(getattr(t, PAGE_COL), getattr(t, TIMESTAMP_COL), getattr(t, TRANSCRIPTION_COL))
+        file_path = corpus_dir + os.sep + "txt"
+        file_name = unique_name + ".txt"
+        t.add_txt_file(file_path, file_name)
+    return texts, text_location_dict
 
 if __name__ == "__main__":
-    pass
-    #tests the import_letters function and get_letters function, from the get_letters function a list of letter.Letter items should be returned
-    #cProfile.run('get_letters_from_Excel('+FULL_LETTERS_EXCEL+')', 'tmp' + os.sep + 'importer_stats')
-    #cProfile.run('make_text_corpus('+FULL_LETTERS_EXCEL+')')
+    file_name_excel = "test_data" + os.sep + "all_transcriptions_until_16_06_2014.xlsx"
+    corpus_dir = "test_data_excel"
+    if os.path.isdir(corpus_dir):
+            shutil.rmtree(corpus_dir)
+    os.mkdir(corpus_dir)
+    texts, id2texts = get_texts_from_Excel(file_name_excel, corpus_dir) 
+    corpus = make_text_corpus(texts, corpus_dir) 
+    item_to_pickle(corpus_dir +os.path.sep + "corpusfile.pickle", corpus)
+
