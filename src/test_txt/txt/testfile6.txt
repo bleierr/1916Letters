@@ -1,1 +1,0 @@
-The intersection graph of paths in trees

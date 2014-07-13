@@ -5,6 +5,8 @@ Created on 18 Jun 2014
 '''
 
 from gensim import models, corpora, similarities
+from txt_classes import TxtCorpus
+from helper import item_from_pickle, item_to_pickle
 import os
 
 
@@ -53,7 +55,7 @@ def make_topics(vector_corpus, dictionary, num_topics):
                              
     return topics
 
-def topics2docs(vector_corpus, dictionary, num_topics):
+def docs2topics(vector_corpus, dictionary, num_topics):
     """
     Parameters are a vector corpus file, a dictionary that can be used to translate the vector corpus, 
     and an integer for num_topics
@@ -83,5 +85,58 @@ def doc_similarity(vector_corpus, dictionary, test_doc, num_topics):
     #sims = sorted(enumerate(sims), key=lambda item: -item[1])
     return [item for item in sims] 
 
-      
 
+if __name__ == "__main__":
+    path_to_txt_items = "letter_corpus" + os.sep + "corpusfiles.pickle"
+    path_to_txt_items_clean = "letter_corpus" + os.sep + "corpusfiles_clean.pickle"
+    vec_corpus_file = "letter_corpus" + os.sep + "corpus.vect"
+    dict_file = "letter_corpus" + os.sep + "corpus.dict"
+    corpus_dir = "letter_corpus" + os.sep + "letter_corpus.pickle"
+    txtItems = item_from_pickle(path_to_txt_items)
+    """
+    new_corpus_items = []
+    for item in txtItems:
+        new_path = "letter_corpus" + os.sep + "cleantxt" + os.sep + item.unique_name + ".txt"
+        item.txt_file_path = new_path
+        new_corpus_items.append(item)
+    #item_to_pickle(path_to_txt_items_clean, new_corpus_items)
+    #corpus = TxtCorpus(path_to_txt_items_clean)
+    
+    #corpus.add_vector_corpus_and_dictionary(vec_corpus_file, dict_file)
+    
+    #save corpus with dict and vect corpus
+    item_to_pickle(corpus_dir, corpus)
+    corpus = item_from_pickle(corpus_dir)
+    """
+    nodes_strg = "Id,Label,inCollection,TextAmount"
+    for topic in range(16):
+        nodes_strg += "\nT{0},{1},{2},{3}".format(topic, "Topic "+str(topic), "topic", 100)
+    for item in txtItems:
+        node_name = item.unique_name
+        in_collection = item.Collection
+        num_words = len(item.get_txt())
+        nodes_strg += "\n{0},{1},{2},{3}".format(node_name, "Letter "+str(node_name), in_collection, num_words)
+    
+    with open("letters_nodes_gephi.txt", "w") as f:
+        f.write(nodes_strg)
+    
+    """
+    d = corpus.get_dictionary()
+    print d
+    v = corpus.get_vector_corpus()
+    topics = make_topics(v, d, 16)
+    
+    t2d = docs2topics(v, d, 16)
+    
+    #print topics
+    strg = ""
+    with open("letter_corpus" + os.sep +"topic_analysis.txt", "w") as f:
+        for num,item in enumerate(topics):
+            strg += "{0} Topic: {1}\n\n".format(num, item)
+        
+        strg += "\n\n\n\n\n"
+        for num,item in enumerate(t2d):
+            strg += "{0} Topic: {1}\n\n".format(num, item)   
+            
+        f.write(strg)
+    """

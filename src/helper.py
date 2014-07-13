@@ -13,7 +13,7 @@ from settings import STOPWORD_LST
 
 
 def replace_problem_char(strg):
-    for pat, repl in [("é", "e"), ("’", "'")]:
+    for pat, repl in [("é", "e"), ("’", "'"),("À", "A")]:
         expr = re.compile(pat)
     return expr.sub(repl, strg)
 

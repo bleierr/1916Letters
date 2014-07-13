@@ -3,14 +3,14 @@ Created on 16 May 2014
 
 @author: Bleier
 '''
-import xlrd, os
+import xlrd, os, sys, getopt
 import datetime
 import shutil
 from helper import item_to_pickle, get_text_files
 from txt_classes import TxtItem, TxtCorpus
 from settings import TIMESTAMP_COL, TRANSCRIPTION_COL, TXT_ID, PAGE_COL
 
-def make_text_corpus(texts, file_path, corpus_file_name=None, corpus_dict_name=None, corpus_vect_name=None):
+def make_txt_corpus(texts, file_path, corpus_file_name=None, corpus_dict_name=None, corpus_vect_name=None):
     
     if not corpus_file_name:
         corpus_file_name = "text_corpus.pickle"
@@ -46,12 +46,14 @@ def get_texts_from_files(dir_path, corpus_dir, file_ext=".txt"):
     documents = get_text_files(dir_path, file_ext)
     text_location_dict = {}
     texts = []
-    for idx, file_path in enumerate(documents):
-        unique_name = str(idx)+"_"+file_path
-        t = TxtItem(unique_name, file_path)
-        file_path = corpus_dir + os.sep + "txt"
+    for idx, file_name in enumerate(documents):
+        unique_name = str(idx)+"_"+file_name
+        t = TxtItem(unique_name)
+        t.txt_file_path = dir_path + os.sep + file_name
+        new_file_path = corpus_dir + os.sep + "txt"
         file_name = unique_name + ".txt"
-        t.add_txt_file(file_path, file_name)
+        t.add_txt_file(new_file_path, file_name)
+        t.txt_file_path = new_file_path
         texts.append(t)
         try:
             #dictionary to map text ids with object location - for quick access of individual items
@@ -90,18 +92,49 @@ def get_texts_from_Excel(file_name_excel, corpus_dir):
         else:
             # l.Translation - 'Translation' is the name that was given to the column in the Excel file - if the name changes the attribute will change too
             texts[text_location_dict[t.unique_name]].add_page(getattr(t, PAGE_COL), getattr(t, TIMESTAMP_COL), getattr(t, TRANSCRIPTION_COL))
-        file_path = corpus_dir + os.sep + "txt"
-        file_name = unique_name + ".txt"
-        t.add_txt_file(file_path, file_name)
+    #add a txt file folder to each object
+    file_path = corpus_dir + os.sep + "txt"
+    for txt_item in texts:
+        file_name = txt_item.unique_name + ".txt"
+        txt_item.add_txt_file(file_path, file_name)
     return texts, text_location_dict
 
-if __name__ == "__main__":
-    file_name_excel = "test_data" + os.sep + "all_transcriptions_until_16_06_2014.xlsx"
-    corpus_dir = "test_data_excel"
-    if os.path.isdir(corpus_dir):
-            shutil.rmtree(corpus_dir)
-    os.mkdir(corpus_dir)
-    texts, id2texts = get_texts_from_Excel(file_name_excel, corpus_dir) 
-    corpus = make_text_corpus(texts, corpus_dir) 
-    item_to_pickle(corpus_dir +os.path.sep + "corpusfile.pickle", corpus)
 
+def main(mode, file_name_excel=None, corpus_dir=None, txt_dir_path=None):
+    if not corpus_dir:
+        current_dir = os.getcwd()
+        corpus_dir = current_dir + os.sep + "corpus"
+        print "No corpus directory was passed as argument. The corpus was created in {0}".format(corpus_dir)
+        if os.path.isdir(corpus_dir):
+            inp = raw_input("The directory already exists, shall it be overwritten?Y/N: ")
+            if inp == "Y" or inp == "y":
+                shutil.rmtree(corpus_dir)
+                
+            elif inp == "N" or inp == "n":
+                return None
+            else:
+                print "Wrong input!"
+                return None
+        os.mkdir(corpus_dir)
+    if mode == "excel":
+        txtItems, id2texts = get_texts_from_Excel(file_name_excel, corpus_dir)
+        item_to_pickle(corpus_dir + os.path.sep + "corpusfiles.pickle", txtItems)
+    elif mode == "txt":
+        txtItems, id2texts = get_texts_from_files(txt_dir_path, corpus_dir, file_ext=".txt")
+        item_to_pickle(corpus_dir + os.sep + "corpusfiles.pickle", txtItems)
+            
+
+if __name__ == "__main__":
+    opts, args = getopt.getopt(sys.argv[1:], "", ["mode=", "file_name_excel=", "corpus_dir=", "txt_dir_path="])
+    print opts, args
+    key_args = {}
+    for key, value in opts:
+        if key == "--mode":
+            key_args["mode"] = value
+        if key == "--file_name_excel":
+            key_args["file_name_excel"] = value
+        elif key == "--txt_dir_path":
+            key_args["txt_dir_path"] = value
+        if key == "--corpus_dir":
+            key_args["corpus_dir"] = value
+    main(**key_args)

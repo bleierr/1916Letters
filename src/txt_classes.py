@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Created on 13 May 2014
 
@@ -5,7 +6,7 @@ This module contains the letter class
 @author: Bleier
 '''
 from helper import item_to_pickle, item_from_pickle
-import os
+import os, codecs
 from gensim.corpora import Dictionary
 from helper import replace_problem_char
 
@@ -24,11 +25,10 @@ class TxtItem(Bunch):
         self.pages = {}
         self.unique_name = unique_name
         
-    def add_page(self, page_nr, time_stamp, strg): #think about a generalis. of importer???
+    def add_page(self, page_nr, time_stamp, strg): 
         """adds a page to self.txt, 
         a string parameter is expected that will be cleaned of xml markup and transformed into a list
         of word tokens"""
-        #self.txt += clean_txt(strg)
         if page_nr in self.pages:
             self.pages[page_nr].append((time_stamp, strg))
         else:
@@ -40,24 +40,23 @@ class TxtItem(Bunch):
         Returned: self.txt
         """
         if hasattr(self, "txt_file_path"):
-            with open(self.txt_file_path) as f:
+            with codecs.open(self.txt_file_path, "r", "utf-8") as f:
                 txt = f.read().lower().split()
         else:
             txt = []
             for key, page in self.pages.items():
                 most_recent_txt = sorted(page, reverse=True)[0][1]
                 txt += most_recent_txt.lower().split()
-        return [w for w in txt]
+        return txt
     
     def add_txt_file(self, file_path, file_name):
         if not os.path.isdir(file_path):
             os.mkdir(file_path)
-        with open(file_path + os.sep + file_name, "w") as f:
+        with codecs.open(file_path + os.sep + file_name, "w", "utf-8") as f:
             t = " ".join(self.get_txt())
-            t = replace_problem_char(t).encode("utf-8")
-            print t
+            t = replace_problem_char(t)
             f.write(t)
-        self.add_attr("txt_file_path", file_path + os.sep + file_name)
+        self.txt_file_path = file_path + os.sep + file_name
     
     def get_dict(self):
         txt = self.get_txt()
@@ -97,13 +96,14 @@ class TxtCorpus(object):
             
     def get_txtitems(self):
         for item in item_from_pickle(self.file):
-            # returns the transcriptions stored as lists of pages and word token from the letter object's txt attribute
             yield item
             
     def get_tokens(self):
+        words = []
         for item in item_from_pickle(self.file):
             # returns the transcriptions stored as lists of pages and word token from the letter object's txt attribute
-            yield [w for w in item.get_txt()] 
+            words.append(item.get_txt())
+        return words 
             
     def add_attr(self, name, value):
         """After checking if such an attribute does not yet exist, adds a single attribute to the object.
@@ -114,7 +114,7 @@ class TxtCorpus(object):
         else:
             setattr(self, name, value)
             
-    def get_dict(self):
+    def get_dictionary(self):
         if hasattr(self, "dict_path"):
             return item_from_pickle(self.dict_path)
         else:
@@ -137,13 +137,14 @@ class TxtCorpus(object):
         #remove all the token that exist only once
         all_tokens = sum(texts, [])
         tokens_once = set(word for word in set(all_tokens) if all_tokens.count(word) == 1)
+        len(tokens_once)
         texts = [[word for word in text if word not in tokens_once]
                  for text in texts]
         d = Dictionary(texts)
         #d.filter_extremes(no_below=10)
         item_to_pickle(dict_file, d)
         self.add_attr("dict_path", dict_file)
-        dictionary = self.get_dict()
+        dictionary = self.get_dictionary()
         #returns a list of tuples of (id, text)
         texts = self.get_tokens() 
         vec_corpus = [dictionary.doc2bow(text) for text in texts] 
