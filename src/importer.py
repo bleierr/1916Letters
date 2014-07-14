@@ -7,7 +7,7 @@ import xlrd, os, sys, getopt
 import datetime
 import shutil
 from helper import item_to_pickle, get_text_files
-from txt_classes import TxtItem, TxtCorpus
+from txt_classes import TxtItem, TxtCorpus, TxtItemLetterExcel, TxtItemTextFile
 from settings import TIMESTAMP_COL, TRANSCRIPTION_COL, TXT_ID, PAGE_COL
 
 def make_txt_corpus(texts, file_path, corpus_file_name=None, corpus_dict_name=None, corpus_vect_name=None):
@@ -47,13 +47,12 @@ def get_texts_from_files(dir_path, corpus_dir, file_ext=".txt"):
     text_location_dict = {}
     texts = []
     for idx, file_name in enumerate(documents):
-        unique_name = str(idx)+"_"+file_name
-        t = TxtItem(unique_name)
-        t.txt_file_path = dir_path + os.sep + file_name
-        new_file_path = corpus_dir + os.sep + "txt"
-        file_name = unique_name + ".txt"
-        t.add_txt_file(new_file_path, file_name)
-        t.txt_file_path = new_file_path
+        unique_name = file_name.split(".")[0]
+        file_path_to_text_file = dir_path + os.sep + file_name
+        t = TxtItemTextFile(file_path_to_text_file, unique_name)
+        new_file_path = corpus_dir + os.sep + "txt" + os.sep + file_name
+        t.add_new_filepath(new_file_path)
+        
         texts.append(t)
         try:
             #dictionary to map text ids with object location - for quick access of individual items
@@ -82,7 +81,7 @@ def get_texts_from_Excel(file_name_excel, corpus_dir):
             else:
                 row_dict.update({sheet.cell_value(0,col):sheet.cell_value(row,col)})
         unique_name = str(row_dict[TXT_ID])
-        t = TxtItem(unique_name, **row_dict)
+        t = TxtItemLetterExcel(unique_name, **row_dict)
         
         if t.unique_name not in text_location_dict:
             t.add_page(getattr(t, PAGE_COL), getattr(t, TIMESTAMP_COL), getattr(t, TRANSCRIPTION_COL)) #note: has to be tested if attributes are correctly imported!

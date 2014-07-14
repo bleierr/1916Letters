@@ -6,7 +6,7 @@ This module contains the letter class
 @author: Bleier
 '''
 from helper import item_to_pickle, item_from_pickle
-import os, codecs
+import os, codecs, shutil
 from gensim.corpora import Dictionary
 from helper import replace_problem_char
 
@@ -22,18 +22,66 @@ class Bunch(object):
 class TxtItem(Bunch):
     def __init__(self, unique_name, *args, **kwargs):
         super(TxtItem, self).__init__(*args, **kwargs)
-        self.pages = {}
         self.unique_name = unique_name
+    
+    def get_dict(self):
+        txt = self.get_txt()
+        dict = {}
+        for item in txt:
+            if item not in dict:
+                dict[item] = 1
+            if item in dict:
+                dict[item] += 1
+        return dict
+    
+    def get_id(self):
+        """Returns the ID / unique name of the current TxtItem"""
+        return self.unique_name
+       
+    def add_attr(self, name, value):
+        """After checking if such an attribute does not yet exist, adds a single attribute to the object.
+        If the attribute name is already used an error is thrown
+        """
+        if hasattr(self, name):
+            raise AttributeError("API conflict: '%s' is already part of the '%s' API" % (name, self.__class__.__name__))
+        else:
+            setattr(self, name, value)
+
+class TxtItemLetterExcel(TxtItem):
+    """
+    This customization of the TxtItem class allows for the storage and retrieval of multi-page letters (for the Excel data file of the 1916 letters project),
+     with multiple edits distinguished by timestamps.
+    """
+    def __init__(self, *args, **kwargs):
+        super(TxtItemLetterExcel, self).__init__(*args, **kwargs)
+        self.pages = {}
         
     def add_page(self, page_nr, time_stamp, strg): 
-        """adds a page to self.txt, 
-        a string parameter is expected that will be cleaned of xml markup and transformed into a list
-        of word tokens"""
+        """Adds a page to the dict self.pages. A page number, timestamp and a string are expected as arguments.        
+        """
         if page_nr in self.pages:
             self.pages[page_nr].append((time_stamp, strg))
         else:
             self.pages.update({page_nr:[(time_stamp, strg)]})
-                 
+            
+    def get_pages(self):
+        return self.pages
+    
+    def add_txt_file(self, file_path, file_name):
+        if not os.path.isdir(file_path):
+            os.mkdir(file_path)
+        with codecs.open(file_path + os.sep + file_name, "w", "utf-8") as f:
+            t = " ".join(self.get_txt())
+            t = replace_problem_char(t)
+            f.write(t)
+        self.txt_file_path = file_path + os.sep + file_name
+        
+        txt = []
+        for key, page in self.pages.items():
+            most_recent_txt = sorted(page, reverse=True)[0][1]
+            txt += most_recent_txt.lower().split()
+        return txt
+    
     def get_txt(self):
         """
         Returns the list of pages of letter text. Each page is a list of word tokens
@@ -49,41 +97,42 @@ class TxtItem(Bunch):
                 txt += most_recent_txt.lower().split()
         return txt
     
-    def add_txt_file(self, file_path, file_name):
-        if not os.path.isdir(file_path):
-            os.mkdir(file_path)
-        with codecs.open(file_path + os.sep + file_name, "w", "utf-8") as f:
-            t = " ".join(self.get_txt())
-            t = replace_problem_char(t)
-            f.write(t)
-        self.txt_file_path = file_path + os.sep + file_name
-    
-    def get_dict(self):
-        txt = self.get_txt()
-        dict = {}
-        for item in txt:
-            if item not in dict:
-                dict[item] = 1
-            if item in dict:
-                dict[item] += 1
-        return dict
-    
-    def get_id(self):
-        """Returns the ID / unique name of the current TxtItem"""
-        return self.unique_name
-    
-    def get_pages(self):
-        return self.pages
-         
-    def add_attr(self, name, value):
-        """After checking if such an attribute does not yet exist, adds a single attribute to the object.
-        If the attribute name is already used an error is thrown
+class TxtItemTextFile(TxtItem):
+    """
+    This customization of the TxtItem class allows for the storage and retrieval of multi-page letters (for the Excel data file of the 1916 letters project),
+     with multiple edits distinguished by timestamps.
+    """
+    def __init__(self, txt_filename, *args, **kwargs):
+        super(TxtItemTextFile, self).__init__(*args, **kwargs)
+        self.txt_file_path = txt_filename
+        
+    def add_new_filepath(self, filepath): 
+        """Adds a new file path.        
         """
-        if hasattr(self, name):
-            raise AttributeError("API conflict: '%s' is already part of the '%s' API" % (name, self.__class__.__name__))
+        #tests if path already exists, if yes the attribute will be assigned the new filepath
+        if os.path.isfile(filepath):
+            self.txt_file_path = filepath
+        #tests if the directory already exists, if not it will be created
+        dirname = os.path.dirname(filepath)
+        if not os.path.isdir(dirname):
+            os.mkdir(dirname)
+        self.make_file_copy(filepath)
+        self.txt_file_path = filepath
+            
+    def make_file_copy(self, new_filepath):
+        shutil.copyfile(self.txt_file_path, new_filepath)
+    
+    def get_txt(self):
+        """
+        Returns the list of pages of letter text. Each page is a list of word tokens
+        Returned: self.txt
+        """
+        if hasattr(self, "txt_file_path"):
+            with codecs.open(self.txt_file_path, "r", "utf-8") as f:
+                txt = f.read().lower().split()
+            return txt
         else:
-            setattr(self, name, value)
-
+            raise AttributeError
 
 class TxtCorpus(object):
     def __init__(self, file_name):
@@ -95,8 +144,10 @@ class TxtCorpus(object):
             yield item.get_txt() 
             
     def get_txtitems(self):
+        items = []
         for item in item_from_pickle(self.file):
-            yield item
+            items.append(item)
+        return items
             
     def get_tokens(self):
         words = []
@@ -137,7 +188,6 @@ class TxtCorpus(object):
         #remove all the token that exist only once
         all_tokens = sum(texts, [])
         tokens_once = set(word for word in set(all_tokens) if all_tokens.count(word) == 1)
-        len(tokens_once)
         texts = [[word for word in text if word not in tokens_once]
                  for text in texts]
         d = Dictionary(texts)
