@@ -10,18 +10,21 @@ from helper import item_to_pickle, get_text_files
 from txt_classes import TxtItem, TxtCorpus, TxtItemLetterExcel, TxtItemTextFile
 from settings import TIMESTAMP_COL, TRANSCRIPTION_COL, TXT_ID, PAGE_COL
 
-def make_txt_corpus(texts, file_path, corpus_file_name=None, corpus_dict_name=None, corpus_vect_name=None):
+def make_txt_corpus(corpus_dir_path, txt_items=None, path_to_txt_items=None, corpus_file_name=None, corpus_dict_name=None, corpus_vect_name=None):
     
     if not corpus_file_name:
         corpus_file_name = "text_corpus.pickle"
+    if txt_items:
+        path_to_txt_items = corpus_dir_path + os.sep + "txtitems.pickle"
+        item_to_pickle(path_to_txt_items, txt_items) 
     
-    item_to_pickle(file_path + os.sep + corpus_file_name, texts) 
-    corpus = TxtCorpus(file_path + os.sep + corpus_file_name)
+    corpus = TxtCorpus(path_to_txt_items)
+    item_to_pickle(corpus_dir_path + os.sep + corpus_file_name, corpus)
     #make a dictionary of the words in the corpus
     if not corpus_dict_name:
-        corpus_dict_name = file_path + os.sep + "text_corpus.dict"
+        corpus_dict_name = corpus_dir_path + os.sep + "text_corpus.dict"
     if not corpus_vect_name:
-        corpus_vect_name = file_path + os.sep + "text_vect_corpus.pickle"
+        corpus_vect_name = corpus_dir_path + os.sep + "text_vect_corpus.pickle"
     corpus.add_vector_corpus_and_dictionary(corpus_vect_name, corpus_dict_name)
     return corpus
 
@@ -99,22 +102,22 @@ def get_texts_from_Excel(file_name_excel, corpus_dir):
     return texts, text_location_dict
 
 
-def main(mode, file_name_excel=None, corpus_dir=None, txt_dir_path=None):
+def importer_main(mode, file_name_excel=None, corpus_dir=None, txt_dir_path=None):
     if not corpus_dir:
         current_dir = os.getcwd()
         corpus_dir = current_dir + os.sep + "corpus"
         print "No corpus directory was passed as argument. The corpus was created in {0}".format(corpus_dir)
-        if os.path.isdir(corpus_dir):
-            inp = raw_input("The directory already exists, shall it be overwritten?Y/N: ")
-            if inp == "Y" or inp == "y":
-                shutil.rmtree(corpus_dir)
-                
-            elif inp == "N" or inp == "n":
-                return None
-            else:
-                print "Wrong input!"
-                return None
-        os.mkdir(corpus_dir)
+    if os.path.isdir(corpus_dir):
+        inp = raw_input("The directory already exists, shall it be overwritten?Y/N: ")
+        if inp == "Y" or inp == "y":
+            shutil.rmtree(corpus_dir)
+            
+        elif inp == "N" or inp == "n":
+            return None
+        else:
+            print "Wrong input!"
+            return None
+    os.mkdir(corpus_dir)
     if mode == "excel":
         txtItems, id2texts = get_texts_from_Excel(file_name_excel, corpus_dir)
         item_to_pickle(corpus_dir + os.path.sep + "corpusfiles.pickle", txtItems)
@@ -125,10 +128,9 @@ def main(mode, file_name_excel=None, corpus_dir=None, txt_dir_path=None):
 
 if __name__ == "__main__":
     opts, args = getopt.getopt(sys.argv[1:], "", ["mode=", "file_name_excel=", "corpus_dir=", "txt_dir_path="])
-    print opts, args
     key_args = {}
     for key, value in opts:
-        if key == "--mode":
+        if key == "--mode": #mode values: 'txt' or 'excel'
             key_args["mode"] = value
         if key == "--file_name_excel":
             key_args["file_name_excel"] = value
@@ -136,4 +138,4 @@ if __name__ == "__main__":
             key_args["txt_dir_path"] = value
         if key == "--corpus_dir":
             key_args["corpus_dir"] = value
-    main(**key_args)
+    importer_main(**key_args)

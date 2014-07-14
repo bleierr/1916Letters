@@ -69,7 +69,7 @@ class Test(unittest.TestCase):
         
         # makes the test corpus from an excel file
         self.excel_items, id2texts = get_texts_from_Excel(excel_file, self.tempdir_excel) 
-        self.c_from_excel = make_txt_corpus(self.excel_items, self.tempdir_excel)
+        self.c_from_excel = make_txt_corpus(self.tempdir_excel, txt_items=self.excel_items)
         
         self.tempdir_txt = "tmp" + os.sep + "txtsource"
         if os.path.isdir(self.tempdir_txt):
@@ -81,7 +81,7 @@ class Test(unittest.TestCase):
                 f.write(item)
         #makes a text corpus from a number of text files
         self.txt_items, id2texts = get_texts_from_files(self.tempdir_txt, self.tempdir_txt, ".txt") 
-        self.c_from_txt = make_txt_corpus(self.txt_items, self.tempdir_txt)
+        self.c_from_txt = make_txt_corpus(self.tempdir_txt, txt_items=self.txt_items)
         
     def test_get_texts_from_Excel(self):
         """

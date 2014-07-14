@@ -8,7 +8,7 @@ from settings import CLEANING_PATTERN, STOPWORD_LST, STOPWORD_FILE, SPELL_CHECK_
 from helper import item_to_shelve, item_from_shelve, get_text_files
 from nltk import stem
 import enchant
-import re, os, shutil
+import re, os, shutil, getopt, sys
 
 def clean_with_pattern(strg):
     """
@@ -70,17 +70,10 @@ def stemmer(wordlst):
             stem_words.append((w, st.stem(w)))
         return stem_words
 
-def clean_all(file_dir_path, clean_files_dir=None):
-    if not clean_files_dir:
-        clean_files_dir = os.path.split(os.path.abspath(file_dir_path))[0] + os.sep + "cleantxt"
-    
-    #make file dir for the clean txt files
-    if os.path.isdir(clean_files_dir):
-        shutil.rmtree(clean_files_dir)
-    os.mkdir(clean_files_dir)
+def clean_all(file_dir_path, clean_files_dir, mode="pat+stop"):
+    #make a directory for the cleaning log
     stat_dir = clean_files_dir + os.sep + "cleaninglog"
     os.mkdir(stat_dir)
-    
     
     filenames = get_text_files(file_dir_path, ext=".txt")
     
@@ -90,39 +83,80 @@ def clean_all(file_dir_path, clean_files_dir=None):
         file_path = file_dir_path + os.sep + filename
         with open(file_path, "r") as f:
             strg = f.read()
-    
-        wordlst = clean_with_pattern(strg)
-        wordlst = remove_stopwords(wordlst)
+        if mode == "pat+stop":
+            wordlst = clean_with_pattern(strg)
+            wordlst = remove_stopwords(wordlst)
+        else:
+            wordlst = strg.split()
         item_to_shelve(stat_dir+os.sep+"wordlst.shelve", wordlst, filename)
         #check for spelling errors
         err_lst = spell_checking(wordlst)
+        if mode == "spell":
+            words = " ".join(wordlst)
+            for err, corr in err_lst:
+                if corr:
+                    words = words.split(" "+err+" ")
+                    words = " "+corr+" ".join(words)
+            wordlst = words.split()
         if err_lst:
             spell_err += "\n{0}:\n".format(filename)
         
-            for word, err in err_lst:
-                spell_err += "{0}:{1}\n".format(word, err)
+            for err, corr in err_lst:
+                spell_err += "{0}:{1}\n".format(err, corr)
             
         #check for stemming
-        stem_print += "\n{0}:\n".format(filename)
         stem_words = stemmer(wordlst)
+        if mode == "stem":
+            words = []
+            for word, stemw in stem_words:
+                words.append(stemw)
+            wordlst = words
+        
+        stem_print += "\n{0}:\n".format(filename)
         for word, stemw in stem_words:
             stem_print += "{0}:{1}\n".format(word, stemw)
         
         with open(clean_files_dir + os.sep + filename, "w") as f:
             f.write(" ".join(wordlst))
-    
+        
     with open(stat_dir+os.sep+"spelling_errors.log", "w") as f:
         f.write(spell_err)
         
     with open(stat_dir+os.sep+"stem_froms.log", "w") as f:
         f.write(stem_print)
-        
     
+        
+def cleaner_main(file_dir_path=None, clean_files_dir=None, mode="pat+stop"):
+    if not file_dir_path:
+        print "No file path given for text files."
+        return False
+    if not clean_files_dir:
+        clean_files_dir = os.path.split(os.path.abspath(file_dir_path))[0] + os.sep + "cleantxt"
+        #make file dir for the clean txt files
+    if os.path.isdir(clean_files_dir):
+        inp = raw_input("The directory {0} does already exist. Overwrite?Y/N".format(clean_files_dir))
+        if inp in ["Y", "y"]:
+            shutil.rmtree(clean_files_dir)
+        else:
+            return False
+    os.mkdir(clean_files_dir)
+    
+    clean_all(file_dir_path, clean_files_dir, mode=mode)
+    
+     
     
     
 if __name__ == "__main__":
-    dir_path = "letter_corpus" + os.sep + "txt"
-    clean_all(dir_path)
+    opts, args = getopt.getopt(sys.argv[1:], "", ["mode=", "file_dir_path=", "clean_files_dir="])
+    key_args = {}
+    for key, value in opts:
+        if key == "--mode": # mode values: "pat+stop" (default), 'spell', 'stem'
+            key_args["mode"] = value
+        if key == "--file_dir_path":
+            key_args["file_dir_path"] = value
+        elif key == "--clean_files_dir":
+            key_args["clean_files_dir"] = value
+    cleaner_main(**key_args)
                
     
     

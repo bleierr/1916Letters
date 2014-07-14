@@ -6,7 +6,7 @@ Created on 13 May 2014
 import os
 from nltk import corpus
 
-"""
+
 TIMESTAMP = True
 TIMESTAMP_COL = "Translation_Timestamp" #"Timestamp_"
 PAGE_COL = "Page"
@@ -20,6 +20,7 @@ TIMESTAMP_COL = "Timestamp"
 PAGE_COL = "Page"
 TRANSCRIPTION_COL = "Text"
 TXT_ID = "Text_ID"
+"""
 
 NODES_FILE = [()]
 

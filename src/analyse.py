@@ -8,9 +8,10 @@ from gensim import models, corpora, similarities
 from txt_classes import TxtCorpus
 from helper import item_from_pickle, item_to_pickle
 import os
+import importer
 
 
-def make_lda_mallet_topics(vect_corpus, dictionary, num_topics=10,):
+def make_lda_mallet_topics(vect_corpus, dictionary, num_topics=10):
     path_to_mallet = "C:"+os.sep+"mallet"+os.sep+"bin"+os.sep+"mallet"
     mallet_lda = models.LdaMallet(path_to_mallet, corpus=vect_corpus, num_topics=num_topics, id2word=dictionary)
     print mallet_lda.show_topics()
@@ -85,58 +86,47 @@ def doc_similarity(vector_corpus, dictionary, test_doc, num_topics):
     #sims = sorted(enumerate(sims), key=lambda item: -item[1])
     return [item for item in sims] 
 
-
-if __name__ == "__main__":
-    path_to_txt_items = "letter_corpus" + os.sep + "corpusfiles.pickle"
-    path_to_txt_items_clean = "letter_corpus" + os.sep + "corpusfiles_clean.pickle"
-    vec_corpus_file = "letter_corpus" + os.sep + "corpus.vect"
-    dict_file = "letter_corpus" + os.sep + "corpus.dict"
-    corpus_dir = "letter_corpus" + os.sep + "letter_corpus.pickle"
+def replace_corpus_files(path_to_txt_items, new_txt_directory):
     txtItems = item_from_pickle(path_to_txt_items)
-    """
     new_corpus_items = []
     for item in txtItems:
-        new_path = "letter_corpus" + os.sep + "cleantxt" + os.sep + item.unique_name + ".txt"
+        head, tail = os.path.split(item.txt_file_path)
+        new_path = new_txt_directory + os.sep + tail
         item.txt_file_path = new_path
         new_corpus_items.append(item)
-    #item_to_pickle(path_to_txt_items_clean, new_corpus_items)
-    #corpus = TxtCorpus(path_to_txt_items_clean)
+    os.remove(path_to_txt_items)
+    item_to_pickle(path_to_txt_items, new_corpus_items)
     
-    #corpus.add_vector_corpus_and_dictionary(vec_corpus_file, dict_file)
     
-    #save corpus with dict and vect corpus
-    item_to_pickle(corpus_dir, corpus)
-    corpus = item_from_pickle(corpus_dir)
-    """
-    nodes_strg = "Id,Label,inCollection,TextAmount"
-    for topic in range(16):
-        nodes_strg += "\nT{0},{1},{2},{3}".format(topic, "Topic "+str(topic), "topic", 100)
-    for item in txtItems:
-        node_name = item.unique_name
-        in_collection = item.Collection
-        num_words = len(item.get_txt())
-        nodes_strg += "\n{0},{1},{2},{3}".format(node_name, "Letter "+str(node_name), in_collection, num_words)
+
+def analyse_main(path_to_txt_items=None, corpus_file=None, mode="lsi"):
+    if not path_to_txt_items and not corpus_file:
+        print "A path to a txtItems file or a TxtCorpus file has to be provided."
+        return False
+    if corpus_file:
+        corpus = item_from_pickle(corpus_file)
+        print "Load existing corpus file!"
+    elif path_to_txt_items:
+        #makes a txt corpus
+        head, tail = os.path.split(path_to_txt_items)
+        dir_for_corpus_file = head
+        txtitems = item_from_pickle(path_to_txt_items)
+        print "Createing new corpus file!"
+        corpus = importer.make_txt_corpus(txtitems, dir_for_corpus_file)
+    dictionary = corpus.get_dictionary()
+    vector_corpus = corpus.get_vector_corpus()
     
-    with open("letters_nodes_gephi.txt", "w") as f:
-        f.write(nodes_strg)
+    l = make_lda_mallet_topics(vector_corpus, dictionary, num_topics=10)
+    for item in l:
+        print item
+
+
+if __name__ == "__main__":
+    path_to_txt_items = "c:"+os.sep+"TestTexts"+os.sep+"letterCorpus"+os.sep+"corpusfiles.pickle"
+    new_text_dir = "c:"+os.sep+"TestTexts"+os.sep+"letterCorpus"+os.sep+"cleanfiles"
+    #replace_corpus_files(path_to_txt_items, new_text_dir)
+    path_to_corpus = "c:"+os.sep+"TestTexts"+os.sep+"letterCorpus"+os.sep+"text_corpus.pickle"
+    analyse_main(corpus_file=path_to_corpus)
     
-    """
-    d = corpus.get_dictionary()
-    print d
-    v = corpus.get_vector_corpus()
-    topics = make_topics(v, d, 16)
     
-    t2d = docs2topics(v, d, 16)
     
-    #print topics
-    strg = ""
-    with open("letter_corpus" + os.sep +"topic_analysis.txt", "w") as f:
-        for num,item in enumerate(topics):
-            strg += "{0} Topic: {1}\n\n".format(num, item)
-        
-        strg += "\n\n\n\n\n"
-        for num,item in enumerate(t2d):
-            strg += "{0} Topic: {1}\n\n".format(num, item)   
-            
-        f.write(strg)
-    """
