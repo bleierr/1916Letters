@@ -19,13 +19,13 @@ def make_txt_corpus(corpus_dir_path, txt_items=None, path_to_txt_items=None, cor
         item_to_pickle(path_to_txt_items, txt_items) 
     
     corpus = TxtCorpus(path_to_txt_items)
-    item_to_pickle(corpus_dir_path + os.sep + corpus_file_name, corpus)
     #make a dictionary of the words in the corpus
     if not corpus_dict_name:
         corpus_dict_name = corpus_dir_path + os.sep + "text_corpus.dict"
     if not corpus_vect_name:
         corpus_vect_name = corpus_dir_path + os.sep + "text_vect_corpus.pickle"
     corpus.add_vector_corpus_and_dictionary(corpus_vect_name, corpus_dict_name)
+    item_to_pickle(corpus_dir_path + os.sep + corpus_file_name, corpus)
     return corpus
 
 def txt_to_object(file_name, txt_id, page, nr):

@@ -24,7 +24,7 @@ def make_lda_topics(vect_corpus, dictionary, num_topics=10, passes=1):
     return lda.show_topics(topics=15, topn=20, log=False, formatted=True)
     
 
-def make_topics(vector_corpus, dictionary, num_topics):
+def make_lsi_topics(vector_corpus, dictionary, num_topics):
     """
     Given a vector corpus and a dictionary to translate the vector corpus the function returns a list of topics. 
     The number of topics generated is specified with the parameter num_topics. 
@@ -34,7 +34,7 @@ def make_topics(vector_corpus, dictionary, num_topics):
     corpus_tfidf = tfidf[vector_corpus]
     """for doc in corpus_tfidf:
         print(doc)"""
-    lsi = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=num_topics)
+    lsi = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=num_topics, onepass=False, power_iters=5)
     topics_str = lsi.show_topics(num_topics)
     """
         the topics are returned in a list of topic strings:
@@ -65,7 +65,7 @@ def docs2topics(vector_corpus, dictionary, num_topics):
     tfidf = models.TfidfModel(vector_corpus)
     corpus_tfidf = tfidf[vector_corpus]
 
-    lsi = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=num_topics)
+    lsi = models.LsiModel(corpus_tfidf, id2word=dictionary, num_topics=num_topics, onepass=False, power_iters=5)
     #returns lsi, a list of topics and a list of distribution of topics over the corpus documents
     doc2topics = lsi[corpus_tfidf]
     return doc2topics
@@ -99,27 +99,68 @@ def replace_corpus_files(path_to_txt_items, new_txt_directory):
     
     
 
-def analyse_main(path_to_txt_items=None, corpus_file=None, mode="lsi"):
+def analyse_main(path_to_txt_items='', corpus_file='', mode="lsi"):
+    print path_to_txt_items
     if not path_to_txt_items and not corpus_file:
         print "A path to a txtItems file or a TxtCorpus file has to be provided."
         return False
-    if corpus_file:
+    if os.path.isfile(corpus_file):
         corpus = item_from_pickle(corpus_file)
+        head, tail = os.path.split(corpus_file)
+        corpus_dir = head
         print "Load existing corpus file!"
-    elif path_to_txt_items:
+        if not isinstance(corpus, TxtCorpus):
+            print "The corpus file under {0} does not contain a TxtCorpus".format(corpus_file)
+            return False
+    elif os.path.isfile(path_to_txt_items):
         #makes a txt corpus
         head, tail = os.path.split(path_to_txt_items)
-        dir_for_corpus_file = head
+        corpus_dir = head
         txtitems = item_from_pickle(path_to_txt_items)
-        print "Createing new corpus file!"
-        corpus = importer.make_txt_corpus(txtitems, dir_for_corpus_file)
+        print "Creating new corpus file under {0}".format(corpus_dir)
+        corpus = importer.make_txt_corpus(corpus_dir, txt_items=txtitems)
+        
+    else:
+        "The file path provided is not valid!"
+        return False
     dictionary = corpus.get_dictionary()
     vector_corpus = corpus.get_vector_corpus()
     
+    if mode == "lsi":
+        num_topics = 4
+        topics_lst = make_lsi_topics(vector_corpus, dictionary, num_topics)
+        print_str = ""
+        for idx, t in enumerate(topics_lst):
+            sum_prop = sum([abs(x[0]) for x in t])
+            words = [x[1] for x in t]
+            print_str += "{0}\t{1}\t{2}\n".format(idx, sum_prop, " ".join(words))
+        
+        with open(corpus_dir + os.sep + "topic-keys.txt", "w") as f:
+            f.write(print_str)
+            
+        print_str = "doc\tname\ttopic\tproportion..."
+        docs2topics_lst = docs2topics(vector_corpus, dictionary, num_topics)
+        corpus_items = corpus.get_txtitems()
+        with open(corpus_dir + os.sep + "topic-compostion.txt", "w") as f:
+            for idx, item in enumerate(docs2topics_lst):
+                if idx == 0:
+                    print_str = "doc\tname\ttopic\tproportion..."
+                else:
+                    print_str = ""
+                current_item = corpus_items[idx]
+                prop_lst = []
+                for topic, value in item:
+                    prop_lst.append("{0}\t{1}".format(topic, abs(value)))
+                print_str += "\n{0}\t{1}\t{2}".format(idx, current_item.unique_name, "\t".join(prop_lst) )
+                f.write(print_str)
+
+        
+    
+    """
     l = make_lda_mallet_topics(vector_corpus, dictionary, num_topics=10)
     for item in l:
         print item
-
+    """
 
 if __name__ == "__main__":
     path_to_txt_items = "c:"+os.sep+"TestTexts"+os.sep+"letterCorpus"+os.sep+"corpusfiles.pickle"

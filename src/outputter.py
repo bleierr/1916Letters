@@ -4,6 +4,9 @@ Created on 4 Jun 2014
 @author: Bleier
 outputter.py
 '''
+import os, random, re
+
+
 
 def print_histo(rows, column_fill, labels=None, document_name=""):
     """
@@ -79,6 +82,83 @@ def data_to_output_string(data):
 
 
 
+#Following is code for mallet2gephi transformation#
 
-       
+def get_distribution_quote(lst):
+    max_val = max(lst)*100
+    min_val = min(lst)*100
+    return 100/(max_val - min_val)
+
+def calculate_value_via_quote(quote, min_value, num):
+    return (num*100 - min_value*100) * quote / 100
+
+def get_topic_comp(imp_file_comp, limit=0.1):
+    with open(imp_file_comp, "r") as f:
+        id2topics = {}
+        for item in f:
+            try:
+                topic_comp_lst = item.split("\t")
+                file_name = topic_comp_lst[1]
+                mm = re.search("txt/(\d+.0).txt", file_name)
+                if mm:
+                    name = mm.group(1)
+                    topic_lst = []
+                    
+                    #get only edges if they have certain relevance to topic
+                    for num, i in enumerate(topic_comp_lst[3::2]):
+                        previous_item = num*2 + 3 - 1
+                        if float(i) > limit:
+                            topic_lst.append((topic_comp_lst[previous_item], float(i)))
+                    id2topics[name] = topic_lst   
+                else:
+                    print "no match found"
+            except IndexError:
+                print "index error"
+    return id2topics
+
+def mallet2gephi_edges(imp_file_comp, exp_file, limit=0.1, dist0to1=False):
+    """
+    transforms a mallet compostion txt file into a gephi edges file
+    The layout of the mallet file should be as follows:
+        'doc'\t'name'\t'topic'\t'proportion'\t'topic'\t'proportion'...
+    topics are integer, proportion are floats between 0 and 1
+    The parameter limit is the threshold below which proportions will not be included in the output
+    If dist0to1 is set to 'True' the mallet proportions will be distributed from 0-1
+    """
+    t = get_topic_comp(imp_file_comp, limit=limit)
+
+    value_lst = []
+    for topic_lst in t.values():
+        if len(topic_lst) > 0:
+            for topic, value in topic_lst:
+                value_lst.append(value)
+
+    #head of gephi csv file
+    write_strg = "Source,Target,Type,Id,Weight"
+    
+    if dist0to1:
+        #for dist graph
+        min_value = min(value_lst)
+        quota = get_distribution_quote(value_lst)
+    
+    for name, topic_lst in t.items():
+        if len(topic_lst) > 0:
+            for topic, value in topic_lst:
+                random_id = name + str(random.random())
+                if dist0to1:
+                    value = calculate_value_via_quote(quota, min_value, value)
+                write_strg += "\n{0},T{1},Undirected,{2},{3}".format(name, topic, random_id, value)
+    #write gephi edges data to file
+    with open(exp_file, "w") as f:
+        f.write(write_strg)
+
+
+
+if __name__ == "__main__":
+    imp_file_comp = "Mallet_T12"+os.sep+"letters-compostion_T12.txt"
+    
+    exp_file = "Mallet_T12"+os.sep+"letters_edges_T12.csv"
+    path_to_corpus = "c:"+os.sep+"TestTexts"+os.sep+"letterCorpus"+os.sep+"topic-compostion.txt"
+    path_to_corpus = "c:"+os.sep+"TestTexts"+os.sep+"letterCorpus"+os.sep+"gensim-letters-edges_T4.csv"
+    
         
