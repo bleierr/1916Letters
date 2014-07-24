@@ -165,7 +165,7 @@ if __name__ == "__main__":
     opts, args = getopt.getopt(sys.argv[1:], "", ["mode=", "path_to_corpus=", "num_topics=", "path_to_txt_items=", "new_text_dir="]) 
     key_args = {}
     for key, value in opts:
-        if key == "--mode": #possible mode valuse: 'replace', 'lsi'
+        if key == "--mode": #possible mode values: 'replace', 'lsi'
             key_args["mode"] = value
         if key == "--path_to_corpus":
             key_args["path_to_corpus"] = value
