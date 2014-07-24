@@ -4,10 +4,20 @@ Created on 16 May 2014
 @author: Bleier
 '''
 import unittest, os, shutil, xlwt, datetime
-from txt_classes import TxtCorpus, TxtItem, TxtItemLetterExcel, TxtItemTextFile
+from txt_classes import TxtItem, TxtItemLetterExcel, TxtCorpus, TxtItemTextFile
 from importer import get_texts_from_Excel, get_texts_from_files, make_txt_corpus
 from gensim import corpora
 
+#if this unitest should work the settings in settings.py have to be changed to:
+"""
+#following settings overwrite the settings in settings.py
+#To run the unittest use these settings
+TIMESTAMP = True
+TIMESTAMP_COL = "Timestamp"
+PAGE_COL = "Page"
+TRANSCRIPTION_COL = "Text"
+TXT_ID = "Text_ID"
+"""
 
 documents = ["Human machine interface for lab abc computer applications",
              "A survey of user opinion of computer system response time",

@@ -34,6 +34,9 @@ class TxtItem(Bunch):
                 dict[item] += 1
         return dict
     
+    def __getitem__(self, k):
+        return k
+    
     def get_id(self):
         """Returns the ID / unique name of the current TxtItem"""
         return self.unique_name
@@ -46,6 +49,7 @@ class TxtItem(Bunch):
             raise AttributeError("API conflict: '%s' is already part of the '%s' API" % (name, self.__class__.__name__))
         else:
             setattr(self, name, value)
+            
 
 class TxtItemLetterExcel(TxtItem):
     """
