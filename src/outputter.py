@@ -183,6 +183,7 @@ def outputter_main(mode="search", corpus_file_path=None, attrs=None, python_expr
         if corpus_file_path == None or attrs == None or python_expr == None:
             print "Error: if mode is set to 'search' the parameters 'corpus_file_path', 'python_expr' and 'attrs' are required!"
             return None
+        attrs = attrs.split(", ")
         search_TxtCorpus(corpus_file_path=corpus_file_path, attrs=attrs, python_expr=python_expr, to_file=to_file)
     elif mode == "gephi":
         if imp_file_comp == None or exp_file == None:
@@ -192,20 +193,28 @@ def outputter_main(mode="search", corpus_file_path=None, attrs=None, python_expr
         
 
 if __name__ == "__main__":
-    opts, args = getopt.getopt(sys.argv[1:], "", ["mode=", "path_to_corpus=", "num_topics=", "path_to_txt_items=", "new_text_dir="]) 
+    opts, args = getopt.getopt(sys.argv[1:], "", ["mode=", "corpus_file_path=", "attrs=", "python_expr=", "to_file=" "imp_file_comp=", "exp_file=", "limit=", "dist0to1="]) 
     key_args = {}
     for key, value in opts:
-        if key == "--mode": #possible mode valuse: 'replace', 'lsi'
+        if key == "--mode": #possible mode values: 'search' (default), 'gephi'
             key_args["mode"] = value
-        if key == "--path_to_corpus":
-            key_args["path_to_corpus"] = value
-        if key == "--num_topics":
-            key_args["num_topics"] = value
-        if key == "--path_to_txt_items":
-            key_args["path_to_txt_items"] = value   
-        if key == "--new_text_dir":
-            key_args["new_text_dir"] = value
-    
+        if key == "--corpus_file_path":
+            key_args["corpus_file_path"] = value
+        if key == "--attrs":
+            key_args["attrs"] = value
+        if key == "--python_expr":
+            key_args["python_expr"] = value   
+        if key == "--to_file":
+            key_args["to_file"] = value
+        if key == "--imp_file_comp":
+            key_args["imp_file_comp"] = value
+        if key == "--exp_file":
+            key_args["exp_file"] = value
+        if key == "--limit":
+            key_args["limit"] = value
+        if key == "--dist0to1":
+            key_args["dist0to1"] = value
+   
     outputter_main(**key_args)
     #imp_file_comp = "Mallet_T12"+os.sep+"letters-compostion_T12.txt"
     
