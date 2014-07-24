@@ -7,7 +7,7 @@ Created on 18 Jun 2014
 from gensim import models, corpora, similarities
 from txt_classes import TxtCorpus
 from helper import item_from_pickle, item_to_pickle
-import os, getopt, sys
+import os
 import importer
 
 
@@ -99,87 +99,75 @@ def replace_corpus_files(path_to_txt_items, new_txt_directory):
     
     
 
-def analyse_main(corpus_file='', mode="lsi", num_topics = 4, path_to_txt_items=None, new_text_dir=None):
-    if mode == "replace":
-        if path_to_txt_items == None or new_text_dir == None:
-            print "If mode is set to 'replace', the arguments path_to_txt_items and new_text_dir have to be passed."
-            return None
-        else:
-            replace_corpus_files(path_to_txt_items, new_text_dir)
-    else:
-        print path_to_txt_items
-        if not path_to_txt_items and not corpus_file:
-            print "A path to a txtItems file or a TxtCorpus file has to be provided."
+def analyse_main(path_to_txt_items='', corpus_file='', mode="lsi"):
+    print path_to_txt_items
+    if not path_to_txt_items and not corpus_file:
+        print "A path to a txtItems file or a TxtCorpus file has to be provided."
+        return False
+    if os.path.isfile(corpus_file):
+        corpus = item_from_pickle(corpus_file)
+        head, tail = os.path.split(corpus_file)
+        corpus_dir = head
+        print "Load existing corpus file!"
+        if not isinstance(corpus, TxtCorpus):
+            print "The corpus file under {0} does not contain a TxtCorpus".format(corpus_file)
             return False
-        if os.path.isfile(corpus_file):
-            corpus = item_from_pickle(corpus_file)
-            head, tail = os.path.split(corpus_file)
-            corpus_dir = head
-            print "Load existing corpus file!"
-            if not isinstance(corpus, TxtCorpus):
-                print "The corpus file under {0} does not contain a TxtCorpus".format(corpus_file)
-                return False
-        elif os.path.isfile(path_to_txt_items):
-            #makes a txt corpus
-            head, tail = os.path.split(path_to_txt_items)
-            corpus_dir = head
-            txtitems = item_from_pickle(path_to_txt_items)
-            print "Creating new corpus file under {0}".format(corpus_dir)
-            corpus = importer.make_txt_corpus(corpus_dir, txt_items=txtitems)
-            
-        else:
-            "The file path provided is not valid!"
-            return False
-        dictionary = corpus.get_dictionary()
-        vector_corpus = corpus.get_vector_corpus()
+    elif os.path.isfile(path_to_txt_items):
+        #makes a txt corpus
+        head, tail = os.path.split(path_to_txt_items)
+        corpus_dir = head
+        txtitems = item_from_pickle(path_to_txt_items)
+        print "Creating new corpus file under {0}".format(corpus_dir)
+        corpus = importer.make_txt_corpus(corpus_dir, txt_items=txtitems)
         
-        if mode == "lsi":
-            topics_lst = make_lsi_topics(vector_corpus, dictionary, num_topics)
-            print_str = ""
-            for idx, t in enumerate(topics_lst):
-                sum_prop = sum([abs(x[0]) for x in t])
-                words = [x[1] for x in t]
-                print_str += "{0}\t{1}\t{2}\n".format(idx, sum_prop, " ".join(words))
+    else:
+        "The file path provided is not valid!"
+        return False
+    dictionary = corpus.get_dictionary()
+    vector_corpus = corpus.get_vector_corpus()
+    
+    if mode == "lsi":
+        num_topics = 4
+        topics_lst = make_lsi_topics(vector_corpus, dictionary, num_topics)
+        print_str = ""
+        for idx, t in enumerate(topics_lst):
+            sum_prop = sum([abs(x[0]) for x in t])
+            words = [x[1] for x in t]
+            print_str += "{0}\t{1}\t{2}\n".format(idx, sum_prop, " ".join(words))
+        
+        with open(corpus_dir + os.sep + "topic-keys.txt", "w") as f:
+            f.write(print_str)
             
-            with open(corpus_dir + os.sep + "topic-keys.txt", "w") as f:
+        print_str = "doc\tname\ttopic\tproportion..."
+        docs2topics_lst = docs2topics(vector_corpus, dictionary, num_topics)
+        corpus_items = corpus.get_txtitems()
+        with open(corpus_dir + os.sep + "topic-compostion.txt", "w") as f:
+            for idx, item in enumerate(docs2topics_lst):
+                if idx == 0:
+                    print_str = "doc\tname\ttopic\tproportion..."
+                else:
+                    print_str = ""
+                current_item = corpus_items[idx]
+                prop_lst = []
+                for topic, value in item:
+                    prop_lst.append("{0}\t{1}".format(topic, abs(value)))
+                print_str += "\n{0}\t{1}\t{2}".format(idx, current_item.unique_name, "\t".join(prop_lst) )
                 f.write(print_str)
-                
-            print_str = "doc\tname\ttopic\tproportion..."
-            docs2topics_lst = docs2topics(vector_corpus, dictionary, num_topics)
-            corpus_items = corpus.get_txtitems()
-            with open(corpus_dir + os.sep + "topic-compostion.txt", "w") as f:
-                for idx, item in enumerate(docs2topics_lst):
-                    if idx == 0:
-                        print_str = "doc\tname\ttopic\tproportion..."
-                    else:
-                        print_str = ""
-                    current_item = corpus_items[idx]
-                    prop_lst = []
-                    for topic, value in item:
-                        prop_lst.append("{0}\t{1}".format(topic, abs(value)))
-                    print_str += "\n{0}\t{1}\t{2}".format(idx, current_item.unique_name, "\t".join(prop_lst) )
-                    f.write(print_str)
+
+        
+    
+    """
+    l = make_lda_mallet_topics(vector_corpus, dictionary, num_topics=10)
+    for item in l:
+        print item
+    """
 
 if __name__ == "__main__":
-    
-    opts, args = getopt.getopt(sys.argv[1:], "", ["mode=", "path_to_corpus=", "num_topics=", "path_to_txt_items=", "new_text_dir="]) 
-    key_args = {}
-    for key, value in opts:
-        if key == "--mode": #possible mode valuse: 'replace', 'lsi'
-            key_args["mode"] = value
-        if key == "--path_to_corpus":
-            key_args["path_to_corpus"] = value
-        if key == "--num_topics":
-            key_args["num_topics"] = value
-        if key == "--path_to_txt_items":
-            key_args["path_to_txt_items"] = value   
-        if key == "--new_text_dir":
-            key_args["new_text_dir"] = value
-    #path_to_txt_items = "c:"+os.sep+"TestTexts"+os.sep+"letterCorpus"+os.sep+"corpusfiles.pickle"
-    #new_text_dir = "c:"+os.sep+"TestTexts"+os.sep+"letterCorpus"+os.sep+"cleanfiles"
-
-    #path_to_corpus = "c:"+os.sep+"TestTexts"+os.sep+"letterCorpus"+os.sep+"text_corpus.pickle"
-    analyse_main(**key_args)
+    path_to_txt_items = "c:"+os.sep+"TestTexts"+os.sep+"letterCorpus"+os.sep+"corpusfiles.pickle"
+    new_text_dir = "c:"+os.sep+"TestTexts"+os.sep+"letterCorpus"+os.sep+"cleanfiles"
+    #replace_corpus_files(path_to_txt_items, new_text_dir)
+    path_to_corpus = "c:"+os.sep+"TestTexts"+os.sep+"letterCorpus"+os.sep+"text_corpus.pickle"
+    analyse_main(corpus_file=path_to_corpus)
     
     
     

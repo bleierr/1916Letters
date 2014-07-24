@@ -5,7 +5,7 @@ Created on 17 May 2014
 @author: Bleier
 '''
 import unittest
-from helper import replace_problem_char
+from helper import replace_problem_char, clean_txt
 
 
 class Test(unittest.TestCase):

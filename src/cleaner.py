@@ -5,7 +5,7 @@ This module contains the letter class
 @author: Bleier
 '''
 from settings import CLEANING_PATTERN, STOPWORD_LST, STOPWORD_FILE, SPELL_CHECK_PWL
-from helper import item_to_shelve, get_text_files
+from helper import item_to_shelve, item_from_shelve, get_text_files
 from nltk import stem
 import enchant
 import re, os, shutil, getopt, sys
@@ -126,12 +126,12 @@ def clean_all(file_dir_path, clean_files_dir, mode="pat+stop"):
         f.write(stem_print)
     
         
-def cleaner_main(files_dir=None, clean_files_dir=None, mode="pat+stop"):
-    if not files_dir:
+def cleaner_main(file_dir_path=None, clean_files_dir=None, mode="pat+stop"):
+    if not file_dir_path:
         print "No file path given for text files."
         return False
     if not clean_files_dir:
-        clean_files_dir = os.path.split(os.path.abspath(files_dir))[0] + os.sep + "cleantxt"
+        clean_files_dir = os.path.split(os.path.abspath(file_dir_path))[0] + os.sep + "cleantxt"
         #make file dir for the clean txt files
     if os.path.isdir(clean_files_dir):
         inp = raw_input("The directory {0} does already exist. Overwrite?Y/N".format(clean_files_dir))
@@ -141,16 +141,19 @@ def cleaner_main(files_dir=None, clean_files_dir=None, mode="pat+stop"):
             return False
     os.mkdir(clean_files_dir)
     
-    clean_all(files_dir, clean_files_dir, mode=mode)
+    clean_all(file_dir_path, clean_files_dir, mode=mode)
+    
      
+    
+    
 if __name__ == "__main__":
-    opts, args = getopt.getopt(sys.argv[1:], "", ["mode=", "files_dir=", "clean_files_dir="])
+    opts, args = getopt.getopt(sys.argv[1:], "", ["mode=", "file_dir_path=", "clean_files_dir="])
     key_args = {}
     for key, value in opts:
         if key == "--mode": # mode values: "pat+stop" (default), 'spell', 'stem'
             key_args["mode"] = value
-        if key == "--files_dir":
-            key_args["files_dir"] = value
+        if key == "--file_dir_path":
+            key_args["file_dir_path"] = value
         elif key == "--clean_files_dir":
             key_args["clean_files_dir"] = value
     cleaner_main(**key_args)
