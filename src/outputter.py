@@ -97,7 +97,7 @@ def get_topic_comp(imp_file_comp, limit=0.1):
             try:
                 topic_comp_lst = item.split("\t")
                 file_name = topic_comp_lst[1]
-                print file_name
+                #print file_name
                 if "//" in file_name:
                     #cut out name from file name string - used for mallet files
                     mm = re.search("txt/(\d+.0).txt", file_name)
@@ -107,14 +107,15 @@ def get_topic_comp(imp_file_comp, limit=0.1):
                         print "no match found"   
                 else:
                     name = file_name
-                    topic_lst = []
                     
-                    #get only edges if they have certain relevance to topic
-                    for num, i in enumerate(topic_comp_lst[3::2]):
-                        previous_item = num*2 + 3 - 1
-                        if float(i) > limit:
-                            topic_lst.append((topic_comp_lst[previous_item], float(i)))
-                    id2topics[name] = topic_lst   
+                
+                topic_lst = []
+                #get only edges if they have certain relevance to topic
+                for num, i in enumerate(topic_comp_lst[3::2]):
+                    previous_item = num*2 + 3 - 1
+                    if float(i) > float(limit):
+                        topic_lst.append((topic_comp_lst[previous_item], float(i)))
+                id2topics[name] = topic_lst   
                     
             except IndexError:
                 print "index error"
@@ -140,16 +141,17 @@ def mallet2gephi_edges(imp_file_comp, exp_file, limit=0.1, dist0to1=False):
     #head of gephi csv file
     write_strg = "Source,Target,Type,Id,Weight"
     
-    if dist0to1:
+    if dist0to1 and len(value_lst)>0:
         #for dist graph
         min_value = min(value_lst)
         p = get_percent_of_diff(value_lst)
     
     for name, topic_lst in t.items():
+        #print len(topic_lst)
         if len(topic_lst) > 0:
             for topic, value in topic_lst:
                 random_id = name + str(random.random())
-                if dist0to1:
+                if dist0to1 and len(value_lst)>0:
                     value = distribute_values(p, min_value, value)
                 write_strg += "\n{0},T{1},Undirected,{2},{3}".format(name, topic, random_id, value)
     #write gephi edges data to file
@@ -193,7 +195,7 @@ def outputter_main(mode="search", corpus_file_path=None, attrs=None, python_expr
         
 
 if __name__ == "__main__":
-    opts, args = getopt.getopt(sys.argv[1:], "", ["mode=", "corpus_file_path=", "attrs=", "python_expr=", "to_file=" "imp_file_comp=", "exp_file=", "limit=", "dist0to1="]) 
+    opts, args = getopt.getopt(sys.argv[1:], "", ["mode=", "corpus_file_path=", "attrs=", "python_expr=", "to_file=", "imp_file_comp=", "exp_file=", "limit=", "dist0to1="]) 
     key_args = {}
     for key, value in opts:
         if key == "--mode": #possible mode values: 'search' (default), 'gephi'
@@ -224,8 +226,8 @@ if __name__ == "__main__":
     
     #mallet2gephi_edges(path_to_input, path_to_result, limit=0.25, dist0to1=False)
     
-    corpus_file_path = "c:"+os.sep+"TestTexts"+os.sep+"letterCorpus"+os.sep+"text_corpus.pickle"
-    search_TxtCorpus(corpus_file_path,['Language'], "item.Language!='English'")
+    #corpus_file_path = "c:"+os.sep+"TestTexts"+os.sep+"letterCorpus"+os.sep+"text_corpus.pickle"
+    #search_TxtCorpus(corpus_file_path,['Language'], "item.Language!='English'")
     
     
     

@@ -37,6 +37,6 @@ CLEANING_PATTERN = [("no-group", "<unclear>questionable reading</unclear>"), # a
                     ("use-group", "[\W]*(\w+[\w\'-/\.]*\w+|\w|&)[\W]*")
                      ] # 1916 letter cleaning pattern
 
-                    
+
 
 
