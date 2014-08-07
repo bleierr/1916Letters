@@ -5,7 +5,7 @@ Created on 13 May 2014
 '''
 from nltk import corpus
 
-"""
+
 TIMESTAMP = True
 TIMESTAMP_COL = "Translation_Timestamp" #"Timestamp_"
 PAGE_COL = "Page"
@@ -13,13 +13,14 @@ TRANSCRIPTION_COL = "Translation"
 TXT_ID = "Letter"
 """
 
-#following settings overwrite the settings in settings.py
+#following settings
 #To run the unittest use these settings
 TIMESTAMP = True
 TIMESTAMP_COL = "Timestamp"
 PAGE_COL = "Page"
 TRANSCRIPTION_COL = "Text"
 TXT_ID = "Text_ID"
+"""
 
 STOPWORD_LST = corpus.stopwords.words("english") + ["&", "&amp;"] 
 STOPWORD_FILE = "letters_stopwords.txt" #if not stopword file is used 'None' has to be added

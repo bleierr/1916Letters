@@ -19,11 +19,15 @@ This project focuses especially on private collections and the letters and voice
 *	**outputter.py** - several functions to format the data generated from analyse.py, and prepare it for visualisation in Gephi
 
 All main modules can be used via the command line.
+For each module a help command is available: 
+python module_name.py -h
 
 When calling **importer.py** the following arguments are required:
-mode - either “txt” or “excel”
-file_name_excel or txt_dir_path - depending on the mode chosen
-corpus_dir - a directory where the text corpus should be saved
+-m or --mode: either “txt” or “excel”
+-f --file_name_excel or -d --txt_dir_path - depending on the mode chosen
+-c --corpus_dir - a directory where the text corpus should be saved
+
+-m excel -f c:\path_to_excel\all_transcriptions_until_16_06_2014.xlsx
 
 When calling **cleaner.py** the following arguments are required:
 mode - mode values can be "pat+stop" (default), 'spell', 'stem', ‘pat+stop’ cleaning just using the cleaning pattern and stopword list, if ‘spell’ or ‘stem’ is set the spell checker and stemmer will be used as well to clean the texts. It is recommended to use first the default setting, this will also generate two txt files listing the changes the spell checker and stemmer would make if run. 

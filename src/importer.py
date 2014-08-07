@@ -4,6 +4,7 @@ Created on 16 May 2014
 @author: Bleier
 '''
 import xlrd, os, sys, getopt
+from optparse import OptionParser
 import datetime
 import shutil
 from helper import item_to_pickle, get_text_files
@@ -70,30 +71,38 @@ def get_texts_from_Excel(file_name_excel, corpus_dir):
     The function returns a TxtCorpus
     """
     #Creates an object of type Book from xlrd.book object
-    wb = xlrd.open_workbook(filename=file_name_excel, encoding_override="utf-8")
+    try:
+        wb = xlrd.open_workbook(filename=file_name_excel, encoding_override="utf-8")
+    except xlrd.XLRDError:
+        print "The file at the location {} is not a valid excel format".format(file_name_excel)
+        sys.exit()
     sheet = wb.sheet_by_index(0)
     texts = []
     text_location_dict = {}
-    for row in range(1,sheet.nrows):
-        row_dict = {}
-        for col in range(sheet.ncols):
-            if sheet.cell(row,col).ctype == 3: # 1 is type text, 3 xldate
-                date_tuple = xlrd.xldate_as_tuple(sheet.cell_value(row,col), wb.datemode)
-                date_py = datetime.datetime(*date_tuple)
-                row_dict.update({sheet.cell_value(0,col): date_py}) # a datetime.datetime obj is stored
+    try:
+        for row in range(1,sheet.nrows):
+            row_dict = {}
+            for col in range(sheet.ncols):
+                if sheet.cell(row,col).ctype == 3: # 1 is type text, 3 xldate
+                    date_tuple = xlrd.xldate_as_tuple(sheet.cell_value(row,col), wb.datemode)
+                    date_py = datetime.datetime(*date_tuple)
+                    row_dict.update({sheet.cell_value(0,col): date_py}) # a datetime.datetime obj is stored
+                else:
+                    row_dict.update({sheet.cell_value(0,col):sheet.cell_value(row,col)})
+            unique_name = str(row_dict[TXT_ID])
+            t = TxtItemLetterExcel(unique_name, **row_dict)
+            
+            if t.unique_name not in text_location_dict:
+                t.add_page(getattr(t, PAGE_COL), getattr(t, TIMESTAMP_COL), getattr(t, TRANSCRIPTION_COL)) #note: has to be tested if attributes are correctly imported!
+                texts.append(t)
+                #dictionary to map text ids with object location - for quick access of individual items
+                text_location_dict[t.unique_name] = len(texts)-1
             else:
-                row_dict.update({sheet.cell_value(0,col):sheet.cell_value(row,col)})
-        unique_name = str(row_dict[TXT_ID])
-        t = TxtItemLetterExcel(unique_name, **row_dict)
-        
-        if t.unique_name not in text_location_dict:
-            t.add_page(getattr(t, PAGE_COL), getattr(t, TIMESTAMP_COL), getattr(t, TRANSCRIPTION_COL)) #note: has to be tested if attributes are correctly imported!
-            texts.append(t)
-            #dictionary to map text ids with object location - for quick access of individual items
-            text_location_dict[t.unique_name] = len(texts)-1
-        else:
-            # l.Translation - 'Translation' is the name that was given to the column in the Excel file - if the name changes the attribute will change too
-            texts[text_location_dict[t.unique_name]].add_page(getattr(t, PAGE_COL), getattr(t, TIMESTAMP_COL), getattr(t, TRANSCRIPTION_COL))
+                # l.Translation - 'Translation' is the name that was given to the column in the Excel file - if the name changes the attribute will change too
+                texts[text_location_dict[t.unique_name]].add_page(getattr(t, PAGE_COL), getattr(t, TIMESTAMP_COL), getattr(t, TRANSCRIPTION_COL))
+    except KeyError:
+        print "KeyError: possible cause - column names in settings file are not found in the excel source file"
+        sys.exit()
     #add a txt file folder to each object
     file_path = corpus_dir + os.sep + "txt"
     for txt_item in texts:
@@ -102,7 +111,7 @@ def get_texts_from_Excel(file_name_excel, corpus_dir):
     return texts, text_location_dict
 
 
-def importer_main(mode, file_name_excel=None, corpus_dir=None, txt_dir_path=None):
+def main(mode, file_name_excel=None, corpus_dir=None, txt_dir_path=None):
     if not corpus_dir:
         current_dir = os.getcwd()
         corpus_dir = current_dir + os.sep + "corpus"
@@ -127,15 +136,41 @@ def importer_main(mode, file_name_excel=None, corpus_dir=None, txt_dir_path=None
             
 
 if __name__ == "__main__":
-    opts, args = getopt.getopt(sys.argv[1:], "", ["mode=", "file_name_excel=", "corpus_dir=", "txt_dir_path="])
     key_args = {}
-    for key, value in opts:
-        if key == "--mode": #mode values: 'txt' or 'excel'
-            key_args["mode"] = value
-        if key == "--file_name_excel":
-            key_args["file_name_excel"] = value
-        elif key == "--txt_dir_path":
-            key_args["txt_dir_path"] = value
-        if key == "--corpus_dir":
-            key_args["corpus_dir"] = value
-    importer_main(**key_args)
+    parser = OptionParser()
+    parser.add_option('-m', '--mode', dest="mode", action="store", 
+                            help="requires -fx or -ft option. Mode settings: txt/excel")
+    parser.add_option('-f', '--file_name_excel', dest="file_name_excel", 
+                            action="store", help="file_name_excel: path to an excel file, used if -m set to 'excel")    
+    parser.add_option('-d', '--txt_dir_path', dest="txt_dir_path", action="store", 
+                            help="txt_dir_path: path to an folder with txt file, used if -m set to 'txt")    
+    parser.add_option('-c', '--corpus_dir', dest="corpus_dir", action="store", 
+                            help="corpus_dir: optional path to a directory where the imported corpus should he stored")    
+    
+    (options, args) = parser.parse_args()
+
+    #validation
+    if options.mode == "txt":
+        if options.txt_dir_path:
+            if os.path.isdir(options.txt_dir_path):
+                key_args["mode"] = options.mode
+                key_args["txt_dir_path"] = options.txt_dir_path
+            else:
+                parser.error("The path supplied is not a valid directory")
+        else:
+            parser.error("No path to text files supplied")
+    elif options.mode == "excel":
+        if options.file_name_excel:
+            if os.path.isfile(options.file_name_excel):
+                key_args["mode"] = options.mode
+                key_args["file_name_excel"] = options.file_name_excel
+            else:
+                parser.error("The path supplied is not a valid file path")
+        else:
+            parser.error("No path to excel file found")
+    else:
+        parser.error("A mode -m option has to be set (txt/excel)")
+    if options.corpus_dir:
+            key_args["corpus_dir"] = options.corpus_dir
+    main(**key_args)
+    print "corpus successfully created"
